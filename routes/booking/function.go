@@ -13,7 +13,18 @@ func getBooking(tx *sqlx.DB) ([]GetBooking, error) {
 		data  GetBooking
 		datas []GetBooking
 	)
-	query := (`select * from "booking" b`)
+	query := (`select booking_id,
+				customer_id,
+				cars_id,
+				extract(epoch from "start_time")::int as "start_time",
+				extract(epoch from "end_time")::int as "end_time",
+				total_cost,
+				finished,
+				discount,
+				booktype_id,
+				driver_id,
+				total_driver_cost  
+				from "booking" b`)
 
 	rows, err := tx.Queryx(query)
 	if err != nil {
@@ -37,7 +48,18 @@ func getBookingByID(tx *sqlx.DB, id int) (GetBooking, error) {
 		data GetBooking
 	)
 
-	query := (`select * from "booking" b
+	query := (`select booking_id,
+				customer_id,
+				cars_id,
+				extract(epoch from "start_time")::int as "start_time",
+				extract(epoch from "end_time")::int as "end_time",
+				total_cost,
+				finished,
+				discount,
+				booktype_id,
+				driver_id,
+				total_driver_cost 
+				from "booking" b
 	where b."booking_id" = $1`)
 
 	values := []interface{}{
