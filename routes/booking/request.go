@@ -23,12 +23,12 @@ func Booking(router *gin.Engine){
 		
 		booking_get_result, err := getBooking(db)
 		if err != nil {
-			webhook.PostToWebHook(c.Request.Method, c.Request.Host+c.Request.URL.Path, "Failed", err.Error(), "booking | request.go | get")
 			data := Response{
 				Message:       "Failed",
 				Error_Key:     "error_internal_server",
 				Error_Message: "error in getBooking function",
 			}
+			webhook.PostToWebHook(c.Request.Method, c.Request.Host+c.Request.URL.Path, data.Error_Key, err.Error(), "booking | request.go | get")
 			Err.HandleError(err)
 			c.JSON(200, data)
 			return //END
@@ -57,12 +57,12 @@ func Booking(router *gin.Engine){
 
 		book_get_id_result, err := getBookingByID(db,book_id)
 		if err != nil && err != sql.ErrNoRows {
-			webhook.PostToWebHook(c.Request.Method, c.Request.Host+c.Request.URL.Path, "Failed", err.Error(), "Booking | request.go | get/id")
 			data := Response{
 				Message:       "Failed",
 				Error_Key:     "error_internal_server",
 				Error_Message: "error in getBookingByID function",
 			}
+			webhook.PostToWebHook(c.Request.Method, c.Request.Host+c.Request.URL.Path, data.Error_Key, err.Error(), "Booking | request.go | get/id")
 			Err.HandleError(err)
 			c.JSON(200, data)
 			return //END
@@ -70,12 +70,12 @@ func Booking(router *gin.Engine){
 
 		// check if Booking not exist
 		if book_get_id_result.Booking_ID == 0 {
-			webhook.PostToWebHook(c.Request.Method, c.Request.Host+c.Request.URL.Path, "Failed", "Booking ID Not Found", "Booking | request.go | get/id")
 			data := Response{
 				Message:       "Failed",
-				Error_Key:     "error_internal_server",
+				Error_Key:     "error_id_not_found",
 				Error_Message: "error booking not Found",
 			}
+			webhook.PostToWebHook(c.Request.Method, c.Request.Host+c.Request.URL.Path, data.Error_Key, data.Error_Message, "Booking | request.go | get/id")
 			Err.HandleError(err)
 			c.JSON(200, data)
 			return //END
@@ -99,12 +99,12 @@ func Booking(router *gin.Engine){
 
 		err := c.ShouldBindBodyWith(&body,binding.JSON)
 		if err!=nil{
-			webhook.PostToWebHook(c.Request.Method, c.Request.Host+c.Request.URL.Path, "Failed", err.Error(), "book | request.go | add")
 			data := Response{
 				Message:       "Failed",
 				Error_Key:     "error_param",
 				Error_Message: err.Error(),
 			}
+			webhook.PostToWebHook(c.Request.Method, c.Request.Host+c.Request.URL.Path, data.Error_Key, err.Error(), "book | request.go | add")
 			Err.HandleError(err)
 			c.JSON(200, data)
 			return //END
@@ -116,12 +116,12 @@ func Booking(router *gin.Engine){
 		
 		book_add_result, err := addBooking(db,body)
 		if err != nil {
-			webhook.PostToWebHook(c.Request.Method, c.Request.Host+c.Request.URL.Path, "Failed", err.Error(), "booking | request.go | get")
 			data := Response{
 				Message:       "Failed",
 				Error_Key:     "error_internal_server",
 				Error_Message: "error in addBooking function",
 			}
+			webhook.PostToWebHook(c.Request.Method, c.Request.Host+c.Request.URL.Path, data.Error_Key, err.Error(), "booking | request.go | get")
 			Err.HandleError(err)
 			c.JSON(200, data)
 			return //END
@@ -149,12 +149,12 @@ func Booking(router *gin.Engine){
 
 		err := c.ShouldBindBodyWith(&body,binding.JSON)
 		if err!=nil{
-			webhook.PostToWebHook(c.Request.Method, c.Request.Host+c.Request.URL.Path, "Failed", err.Error(), "book | request.go | update")
 			data := Response{
 				Message:       "Failed",
 				Error_Key:     "error_param",
 				Error_Message: err.Error(),
 			}
+			webhook.PostToWebHook(c.Request.Method, c.Request.Host+c.Request.URL.Path, data.Error_Key, err.Error(), "book | request.go | update")
 			Err.HandleError(err)
 			c.JSON(200, data)
 			return //END
@@ -166,12 +166,12 @@ func Booking(router *gin.Engine){
 		
 		book_get_id_result, err := getBookingByID(db,book_id)
 		if err != nil && err != sql.ErrNoRows {
-			webhook.PostToWebHook(c.Request.Method, c.Request.Host+c.Request.URL.Path, "Failed", err.Error(), "Booking | request.go | update")
 			data := Response{
 				Message:       "Failed",
 				Error_Key:     "error_internal_server",
 				Error_Message: "error in getBookingByID function",
 			}
+			webhook.PostToWebHook(c.Request.Method, c.Request.Host+c.Request.URL.Path, data.Error_Key, err.Error(), "Booking | request.go | update")
 			Err.HandleError(err)
 			c.JSON(200, data)
 			return //END
@@ -179,12 +179,12 @@ func Booking(router *gin.Engine){
 
 		// check if Booking not exist
 		if book_get_id_result.Booking_ID == 0 {
-			webhook.PostToWebHook(c.Request.Method, c.Request.Host+c.Request.URL.Path, "Failed", "Booking ID Not Found", "Booking | request.go | update")
 			data := Response{
 				Message:       "Failed",
-				Error_Key:     "error_internal_server",
+				Error_Key:     "error_id_not_found",
 				Error_Message: "error booking not Found",
 			}
+			webhook.PostToWebHook(c.Request.Method, c.Request.Host+c.Request.URL.Path, data.Error_Key, data.Error_Message, "Booking | request.go | update")
 			Err.HandleError(err)
 			c.JSON(200, data)
 			return //END
@@ -192,12 +192,12 @@ func Booking(router *gin.Engine){
 
 		err = updateBooking(db,book_id,body)
 		if err != nil {
-			webhook.PostToWebHook(c.Request.Method, c.Request.Host+c.Request.URL.Path, "Failed", err.Error(), "booking | request.go | update")
 			data := Response{
 				Message:       "Failed",
 				Error_Key:     "error_internal_server",
 				Error_Message: "error in updateBooking function",
 			}
+			webhook.PostToWebHook(c.Request.Method, c.Request.Host+c.Request.URL.Path, data.Error_Key, err.Error(), "booking | request.go | update")
 			Err.HandleError(err)
 			c.JSON(200, data)
 			return //END
@@ -226,12 +226,12 @@ func Booking(router *gin.Engine){
 		
 		book_get_id_result, err := getBookingByID(db,book_id)
 		if err != nil && err != sql.ErrNoRows {
-			webhook.PostToWebHook(c.Request.Method, c.Request.Host+c.Request.URL.Path, "Failed", err.Error(), "Booking | request.go | delete")
 			data := Response{
 				Message:       "Failed",
 				Error_Key:     "error_internal_server",
 				Error_Message: "error in getBookingByID function",
 			}
+			webhook.PostToWebHook(c.Request.Method, c.Request.Host+c.Request.URL.Path, data.Error_Key, err.Error(), "Booking | request.go | delete")
 			Err.HandleError(err)
 			c.JSON(200, data)
 			return //END
@@ -239,12 +239,12 @@ func Booking(router *gin.Engine){
 
 		// check if Booking not exist
 		if book_get_id_result.Booking_ID == 0 {
-			webhook.PostToWebHook(c.Request.Method, c.Request.Host+c.Request.URL.Path, "Failed", "Booking ID Not Found", "Booking | request.go | delete")
 			data := Response{
 				Message:       "Failed",
-				Error_Key:     "error_internal_server",
+				Error_Key:     "error_id_not_found",
 				Error_Message: "error booking not Found",
 			}
+			webhook.PostToWebHook(c.Request.Method, c.Request.Host+c.Request.URL.Path, data.Error_Key, data.Error_Message, "Booking | request.go | delete")
 			Err.HandleError(err)
 			c.JSON(200, data)
 			return //END
@@ -252,12 +252,12 @@ func Booking(router *gin.Engine){
 
 		err = deleteBooking(db,book_id)
 		if err != nil {
-			webhook.PostToWebHook(c.Request.Method, c.Request.Host+c.Request.URL.Path, "Failed", err.Error(), "booking | request.go | delete")
 			data := Response{
 				Message:       "Failed",
 				Error_Key:     "error_internal_server",
 				Error_Message: "error in deleteBooking function",
 			}
+			webhook.PostToWebHook(c.Request.Method, c.Request.Host+c.Request.URL.Path, "Failed", err.Error(), "booking | request.go | delete")
 			Err.HandleError(err)
 			c.JSON(200, data)
 			return //END

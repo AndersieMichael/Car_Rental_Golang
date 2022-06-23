@@ -25,12 +25,12 @@ func Customer(router *gin.Engine) {
 
 		result, err := getCustomer(db)
 		if err != nil {
-			webhook.PostToWebHook(c.Request.Method, c.Request.Host+c.Request.URL.Path, "Failed", err.Error(), "customer | request.go | get")
 			data := Response{
 				Message:       "Failed",
 				Error_Key:     "error_internal_server",
 				Error_Message: "error in getCustomer function",
 			}
+			webhook.PostToWebHook(c.Request.Method, c.Request.Host+c.Request.URL.Path, data.Error_Key, err.Error(), "customer | request.go | get")
 			Err.HandleError(err)
 			c.JSON(200, data)
 			return
@@ -60,12 +60,12 @@ func Customer(router *gin.Engine) {
 		//get customer by id
 		result, err := getCustomerByID(db, c_id)
 		if err != nil && err != sql.ErrNoRows {
-			webhook.PostToWebHook(c.Request.Method, c.Request.Host+c.Request.URL.Path, "Failed", err.Error(), "customer | request.go | get/id")
 			data := Response{
 				Message:       "Failed",
 				Error_Key:     "error_internal_server",
 				Error_Message: "error in getCustomer function",
 			}
+			webhook.PostToWebHook(c.Request.Method, c.Request.Host+c.Request.URL.Path, data.Error_Key, err.Error(), "customer | request.go | get/id")
 			Err.HandleError(err)
 			c.JSON(200, data)
 			return
@@ -73,12 +73,12 @@ func Customer(router *gin.Engine) {
 
 		// check if customer not exist
 		if result.Customer_ID == 0 {
-			webhook.PostToWebHook(c.Request.Method, c.Request.Host+c.Request.URL.Path, "Failed", "Customer Not Found", "customer | request.go | get/id")
 			data := Response{
 				Message:       "Failed",
-				Error_Key:     "error_internal_server",
+				Error_Key:     "error_id_not_found",
 				Error_Message: "error Customer not Found",
 			}
+			webhook.PostToWebHook(c.Request.Method, c.Request.Host+c.Request.URL.Path, data.Error_Key, data.Error_Message, "customer | request.go | get/id")
 			Err.HandleError(err)
 			c.JSON(200, data)
 			return
@@ -104,12 +104,12 @@ func Customer(router *gin.Engine) {
 
 		err := c.ShouldBindBodyWith(&body, binding.JSON)
 		if err != nil {
-			webhook.PostToWebHook(c.Request.Method, c.Request.Host+c.Request.URL.Path, "Failed", err.Error(), "customer | request.go | add")
 			data := Response{
 				Message:       "Failed",
 				Error_Key:     "error_param",
 				Error_Message: err.Error(),
 			}
+			webhook.PostToWebHook(c.Request.Method, c.Request.Host+c.Request.URL.Path, data.Error_Key, err.Error(), "customer | request.go | add")
 			Err.HandleError(err)
 			c.JSON(200, data)
 			return
@@ -120,12 +120,12 @@ func Customer(router *gin.Engine) {
 		db := db.Connect()
 		result, err := addCustomer(db, body)
 		if err != nil {
-			webhook.PostToWebHook(c.Request.Method, c.Request.Host+c.Request.URL.Path, "Failed", err.Error(), "customer | request.go | add")
 			data := Response{
 				Message:       "Failed",
 				Error_Key:     "error_internal_server",
 				Error_Message: "error in getCustomer function",
 			}
+			webhook.PostToWebHook(c.Request.Method, c.Request.Host+c.Request.URL.Path, data.Error_Key, err.Error(), "customer | request.go | add")
 			Err.HandleError(err)
 			c.JSON(200, data)
 			return
@@ -153,12 +153,12 @@ func Customer(router *gin.Engine) {
 
 		err := c.ShouldBindBodyWith(&body, binding.JSON)
 		if err != nil {
-			webhook.PostToWebHook(c.Request.Method, c.Request.Host+c.Request.URL.Path, "Failed", err.Error(), "customer | request.go | Update")
 			data := Response{
 				Message:       "Failed",
 				Error_Key:     "error_param",
 				Error_Message: err.Error(),
 			}
+			webhook.PostToWebHook(c.Request.Method, c.Request.Host+c.Request.URL.Path, data.Error_Key, err.Error(), "customer | request.go | Update")
 			Err.HandleError(err)
 			c.JSON(200, data)
 			return
@@ -172,12 +172,12 @@ func Customer(router *gin.Engine) {
 
 		check_customer_result, err := getCustomerByID(db, c_id)
 		if err != nil && err != sql.ErrNoRows {
-			webhook.PostToWebHook(c.Request.Method, c.Request.Host+c.Request.URL.Path, "Failed", err.Error(), "customer | request.go | Update")
 			data := Response{
 				Message:       "Failed",
 				Error_Key:     "error_internal_server",
 				Error_Message: "error in getCustomerByID function",
 			}
+			webhook.PostToWebHook(c.Request.Method, c.Request.Host+c.Request.URL.Path, data.Error_Key, err.Error(), "customer | request.go | Update")
 			Err.HandleError(err)
 			c.JSON(200, data)
 			return
@@ -186,12 +186,12 @@ func Customer(router *gin.Engine) {
 		// if customer not exist
 
 		if check_customer_result.Customer_ID == 0 {
-			webhook.PostToWebHook(c.Request.Method, c.Request.Host+c.Request.URL.Path, "Failed", "Customer Not Found", "customer | request.go | Update")
 			data := Response{
 				Message:       "Failed",
-				Error_Key:     "error_internal_server",
+				Error_Key:     "error_id_not_found",
 				Error_Message: "error Customer not Found",
 			}
+			webhook.PostToWebHook(c.Request.Method, c.Request.Host+c.Request.URL.Path, data.Error_Key, data.Error_Message, "customer | request.go | Update")
 			Err.HandleError(err)
 			c.JSON(200, data)
 			return
@@ -201,12 +201,12 @@ func Customer(router *gin.Engine) {
 
 		err = updateCustomer(db, c_id, body)
 		if err != nil && err != sql.ErrNoRows {
-			webhook.PostToWebHook(c.Request.Method, c.Request.Host+c.Request.URL.Path, "Failed", err.Error(), "customer | request.go | Update")
 			data := Response{
 				Message:       "Failed",
 				Error_Key:     "error_internal_server",
 				Error_Message: "error in updateCustomer function",
 			}
+			webhook.PostToWebHook(c.Request.Method, c.Request.Host+c.Request.URL.Path, data.Error_Key, err.Error(), "customer | request.go | Update")
 			Err.HandleError(err)
 			c.JSON(200, data)
 			return
@@ -232,12 +232,12 @@ func Customer(router *gin.Engine) {
 
 		check_customer_result, err := getCustomerByID(db, c_id)
 		if err != nil && err != sql.ErrNoRows {
-			webhook.PostToWebHook(c.Request.Method, c.Request.Host+c.Request.URL.Path, "Failed", err.Error(), "customer | request.go | delete")
 			data := Response{
 				Message:       "Failed",
 				Error_Key:     "error_internal_server",
 				Error_Message: "error in getCustomerByID function",
 			}
+			webhook.PostToWebHook(c.Request.Method, c.Request.Host+c.Request.URL.Path, data.Error_Key, err.Error(), "customer | request.go | delete")
 			Err.HandleError(err)
 			c.JSON(200, data)
 			return
@@ -246,12 +246,12 @@ func Customer(router *gin.Engine) {
 		// check if customer exist
 
 		if check_customer_result.Customer_ID == 0 {
-			webhook.PostToWebHook(c.Request.Method, c.Request.Host+c.Request.URL.Path, "Failed", "Customer Not Found", "customer | request.go | delete")
 			data := Response{
 				Message:       "Failed",
-				Error_Key:     "error_internal_server",
+				Error_Key:     "error_id_not_found",
 				Error_Message: "error Customer not Found",
 			}
+			webhook.PostToWebHook(c.Request.Method, c.Request.Host+c.Request.URL.Path, data.Error_Key, data.Error_Message, "customer | request.go | delete")
 			Err.HandleError(err)
 			c.JSON(200, data)
 			return
@@ -261,12 +261,12 @@ func Customer(router *gin.Engine) {
 
 		err = deleteCustomer(db, c_id)
 		if err != nil && err != sql.ErrNoRows {
-			webhook.PostToWebHook(c.Request.Method, c.Request.Host+c.Request.URL.Path, "Failed", err.Error(), "customer | request.go | delete")
 			data := Response{
 				Message:       "Failed",
 				Error_Key:     "error_internal_server",
 				Error_Message: "error in deleteCustomer function",
 			}
+			webhook.PostToWebHook(c.Request.Method, c.Request.Host+c.Request.URL.Path, data.Error_Key, err.Error(), "customer | request.go | delete")
 			Err.HandleError(err)
 			c.JSON(200, data)
 			return
