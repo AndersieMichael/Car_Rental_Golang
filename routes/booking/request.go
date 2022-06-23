@@ -26,6 +26,7 @@ func Booking(router *gin.Engine) {
 		// CONNECT DB
 		//=============================================================
 		db := db.Connect()
+		defer db.Close()
 
 		booking_get_result, err := getBooking(db)
 		if err != nil {
@@ -41,7 +42,6 @@ func Booking(router *gin.Engine) {
 		}
 		// ASSEMBLY RESPONSE
 		//=============================================================
-		defer db.Close()
 		data := Response{
 			Message: "Success",
 			Data:    booking_get_result,
@@ -60,6 +60,7 @@ func Booking(router *gin.Engine) {
 		// CONNECT DB
 		//=============================================================
 		db := db.Connect()
+		defer db.Close()
 
 		book_get_id_result, err := getBookingByID(db, book_id)
 		if err != nil && err != sql.ErrNoRows {
@@ -89,7 +90,6 @@ func Booking(router *gin.Engine) {
 
 		// ASSEMBLY RESPONSE
 		//=============================================================
-		defer db.Close()
 		data := Response{
 			Message: "Success",
 			Data:    book_get_id_result,
@@ -119,6 +119,7 @@ func Booking(router *gin.Engine) {
 		// CONNECT DB
 		//=============================================================
 		db := db.Connect()
+		defer db.Close()
 
 		book_add_result, err := addBooking(db, body)
 		if err != nil {
@@ -135,7 +136,6 @@ func Booking(router *gin.Engine) {
 
 		// ASSEMBLY RESPONSE
 		//=============================================================
-		defer db.Close()
 		data := Response{
 			Message: "Success",
 			Data:    book_add_result,
@@ -170,6 +170,7 @@ func Booking(router *gin.Engine) {
 		// CONNECT DB
 		//=============================================================
 		db := db.Connect()
+		defer db.Close()
 
 		// GET CUSTOMER DATA
 		//=============================================================
@@ -390,7 +391,6 @@ func Booking(router *gin.Engine) {
 
 		// ASSEMBLY RESPONSE
 		//=============================================================
-		defer db.Close()
 		data := Response{
 			Message: "Success",
 			Data:    book_add_result,
@@ -423,6 +423,7 @@ func Booking(router *gin.Engine) {
 		// CONNECT DB
 		//=============================================================
 		db := db.Connect()
+		defer db.Close()
 
 		book_get_id_result, err := getBookingByID(db, book_id)
 		if err != nil && err != sql.ErrNoRows {
@@ -465,7 +466,6 @@ func Booking(router *gin.Engine) {
 
 		// ASSEMBLY RESPONSE
 		//=============================================================
-		defer db.Close()
 		data := Response{
 			Message: "Success",
 		}
@@ -483,6 +483,7 @@ func Booking(router *gin.Engine) {
 		// CONNECT DB
 		//=============================================================
 		db := db.Connect()
+		defer db.Close()
 
 		book_get_id_result, err := getBookingByID(db, book_id)
 		if err != nil && err != sql.ErrNoRows {

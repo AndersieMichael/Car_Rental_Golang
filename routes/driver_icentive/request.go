@@ -21,6 +21,7 @@ func Incentive(router *gin.Engine) {
 		// CONNECT DB
 		//=============================================================
 		db := db.Connect()
+		defer db.Close()
 
 		incentive_get_result, err := getIncentive(db)
 		if err != nil {
@@ -36,7 +37,6 @@ func Incentive(router *gin.Engine) {
 		}
 		// ASSEMBLY RESPONSE
 		//=============================================================
-		defer db.Close()
 		data := Response{
 			Message: "Success",
 			Data:    incentive_get_result,
@@ -55,6 +55,7 @@ func Incentive(router *gin.Engine) {
 		// CONNECT DB
 		//=============================================================
 		db := db.Connect()
+		defer db.Close()
 
 		incentive_get_id_result, err := getIncentiveByID(db, incentive_id)
 		if err != nil && err != sql.ErrNoRows {
@@ -84,7 +85,6 @@ func Incentive(router *gin.Engine) {
 
 		// ASSEMBLY RESPONSE
 		//=============================================================
-		defer db.Close()
 		data := Response{
 			Message: "Success",
 			Data:    incentive_get_id_result,
@@ -114,6 +114,7 @@ func Incentive(router *gin.Engine) {
 		// CONNECT DB
 		//=============================================================
 		db := db.Connect()
+		defer db.Close()
 
 		incentive_add_result, err := AddIncentive(db, body)
 		if err != nil {
@@ -130,7 +131,6 @@ func Incentive(router *gin.Engine) {
 
 		// ASSEMBLY RESPONSE
 		//=============================================================
-		defer db.Close()
 		data := Response{
 			Message: "Success",
 			Data:    incentive_add_result,
@@ -164,6 +164,7 @@ func Incentive(router *gin.Engine) {
 		// CONNECT DB
 		//=============================================================
 		db := db.Connect()
+		defer db.Close()
 
 		incentive_get_id_result, err := getIncentiveByID(db, incentive_id)
 		if err != nil && err != sql.ErrNoRows {
@@ -206,7 +207,6 @@ func Incentive(router *gin.Engine) {
 
 		// ASSEMBLY RESPONSE
 		//=============================================================
-		defer db.Close()
 		data := Response{
 			Message: "Success",
 		}
@@ -224,6 +224,7 @@ func Incentive(router *gin.Engine) {
 		// CONNECT DB
 		//=============================================================
 		db := db.Connect()
+		defer db.Close()
 
 		incentive_get_id_result, err := getIncentiveByID(db, incentive_id)
 		if err != nil && err != sql.ErrNoRows {
@@ -266,7 +267,6 @@ func Incentive(router *gin.Engine) {
 
 		// ASSEMBLY RESPONSE
 		//=============================================================
-		defer db.Close()
 		data := Response{
 			Message: "Success",
 		}

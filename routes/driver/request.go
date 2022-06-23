@@ -21,7 +21,8 @@ func Driver(router *gin.Engine){
 		// CONNECT DB
 		//=============================================================
 		db := db.Connect()	
-		
+		defer db.Close()
+
 		driver_get_result, err := getDriver(db)
 		if err != nil {
 			data := Response{
@@ -36,7 +37,6 @@ func Driver(router *gin.Engine){
 		}
 		// ASSEMBLY RESPONSE
 		//=============================================================
-		defer db.Close()
 		data := Response{
 			Message: "Success",
 			Data:    driver_get_result,
@@ -55,6 +55,7 @@ func Driver(router *gin.Engine){
 		// CONNECT DB
 		//=============================================================
 		db := db.Connect()
+		defer db.Close()
 
 		driver_get_id_result, err := GetDriverByID(db,driver_id)
 		if err != nil && err != sql.ErrNoRows {
@@ -84,7 +85,6 @@ func Driver(router *gin.Engine){
 
 		// ASSEMBLY RESPONSE
 		//=============================================================
-		defer db.Close()
 		data := Response{
 			Message: "Success",
 			Data:    driver_get_id_result,
@@ -114,6 +114,7 @@ func Driver(router *gin.Engine){
 		// CONNECT DB
 		//=============================================================
 		db := db.Connect()
+		defer db.Close()
 		
 		driver_add_result, err := addDriver(db,body)
 		if err != nil {
@@ -130,7 +131,6 @@ func Driver(router *gin.Engine){
 
 		// ASSEMBLY RESPONSE
 		//=============================================================
-		defer db.Close()
 		data := Response{
 			Message: "Success",
 			Data:    driver_add_result,
@@ -164,6 +164,7 @@ func Driver(router *gin.Engine){
 		// CONNECT DB
 		//=============================================================
 		db := db.Connect()
+		defer db.Close()
 		
 		driver_get_id_result, err := GetDriverByID(db,driver_id)
 		if err != nil && err != sql.ErrNoRows {
@@ -224,6 +225,7 @@ func Driver(router *gin.Engine){
 		// CONNECT DB
 		//=============================================================
 		db := db.Connect()
+		defer db.Close()
 		
 		driver_get_id_result, err := GetDriverByID(db,driver_id)
 		if err != nil && err != sql.ErrNoRows {
@@ -266,7 +268,6 @@ func Driver(router *gin.Engine){
 
 		// ASSEMBLY RESPONSE
 		//=============================================================
-		defer db.Close()
 		data := Response{
 			Message: "Success",
 		}

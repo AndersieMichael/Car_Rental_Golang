@@ -20,6 +20,7 @@ func Membership(router *gin.Engine){
 		// CONNECT DB
 		//=============================================================
 		db := db.Connect()
+		defer db.Close()
 
 		membership_get_result, err := getMembership(db)
 		if err != nil {
@@ -35,7 +36,6 @@ func Membership(router *gin.Engine){
 		}
 		// ASSEMBLY RESPONSE
 		//=============================================================
-		defer db.Close()
 		data := Response{
 			Message: "Success",
 			Data:    membership_get_result,
@@ -57,6 +57,7 @@ func Membership(router *gin.Engine){
 		// CONNECT DB
 		//=============================================================
 		db := db.Connect()
+		defer db.Close()
 
 		membership_get_id_result, err := GetMembershipByID(db,member_id)
 
@@ -87,7 +88,6 @@ func Membership(router *gin.Engine){
 
 		// ASSEMBLY RESPONSE
 		//=============================================================
-		defer db.Close()
 		data := Response{
 			Message: "Success",
 			Data:    membership_get_id_result,
@@ -118,6 +118,7 @@ func Membership(router *gin.Engine){
 		// CONNECT DB
 		//=============================================================
 		db := db.Connect()
+		defer db.Close()
 		
 		membership_add_result, err := addMembership(db,body)
 		if err != nil {
@@ -134,7 +135,6 @@ func Membership(router *gin.Engine){
 
 		// ASSEMBLY RESPONSE
 		//=============================================================
-		defer db.Close()
 		data := Response{
 			Message: "Success",
 			Data:    membership_add_result,
@@ -168,6 +168,7 @@ func Membership(router *gin.Engine){
 		// CONNECT DB
 		//=============================================================
 		db := db.Connect()
+		defer db.Close()
 		
 		membership_get_id_result, err := GetMembershipByID(db,member_id)
 		if err != nil && err != sql.ErrNoRows {
@@ -210,7 +211,6 @@ func Membership(router *gin.Engine){
 
 		// ASSEMBLY RESPONSE
 		//=============================================================
-		defer db.Close()
 		data := Response{
 			Message: "Success",
 		}
@@ -229,6 +229,7 @@ func Membership(router *gin.Engine){
 		// CONNECT DB
 		//=============================================================
 		db := db.Connect()
+		defer db.Close()
 		
 		membership_get_id_result, err := GetMembershipByID(db,member_id)
 		if err != nil && err != sql.ErrNoRows {
@@ -271,7 +272,6 @@ func Membership(router *gin.Engine){
 
 		// ASSEMBLY RESPONSE
 		//=============================================================
-		defer db.Close()
 		data := Response{
 			Message: "Success",
 		}

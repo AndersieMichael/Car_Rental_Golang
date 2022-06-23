@@ -21,6 +21,7 @@ func Car(router *gin.Engine) {
 		// CONNECT DB
 		//=============================================================
 		db := db.Connect()
+		defer db.Close()
 
 		result, err := getCar(db)
 		if err != nil {
@@ -37,7 +38,6 @@ func Car(router *gin.Engine) {
 
 		// ASSEMBLY RESPONSE
 		//=============================================================
-		defer db.Close()
 		data := Response{
 			Message: "Success",
 			Data:    result,
@@ -55,6 +55,8 @@ func Car(router *gin.Engine) {
 		// CONNECT DB
 		//=============================================================
 		db := db.Connect()
+		defer db.Close()
+
 		result, err := GetCarByID(db, car_id)
 		if err != nil && err != sql.ErrNoRows {
 			data := Response{
@@ -83,7 +85,6 @@ func Car(router *gin.Engine) {
 
 		// ASSEMBLY RESPONSE
 		//=============================================================
-		defer db.Close()
 		data := Response{
 			Message: "Success",
 			Data:    result,
@@ -113,6 +114,7 @@ func Car(router *gin.Engine) {
 		// CONNECT DB
 		//=============================================================
 		db := db.Connect()
+		defer db.Close()
 
 		car_add_result, err := addCar(db, body)
 		if err != nil {
@@ -129,7 +131,6 @@ func Car(router *gin.Engine) {
 
 		// ASSEMBLY RESPONSE
 		//=============================================================
-		defer db.Close()
 		data := Response{
 			Message: "Success",
 			Data:    car_add_result,
@@ -162,6 +163,7 @@ func Car(router *gin.Engine) {
 		// CONNECT DB
 		//=============================================================
 		db := db.Connect()
+		defer db.Close()
 
 		car_get_id_result, err := GetCarByID(db, car_id)
 		if err != nil && err != sql.ErrNoRows {
@@ -204,7 +206,6 @@ func Car(router *gin.Engine) {
 
 		// ASSEMBLY RESPONSE
 		//=============================================================
-		defer db.Close()
 		data := Response{
 			Message: "Success",
 		}
@@ -221,6 +222,7 @@ func Car(router *gin.Engine) {
 		// CONNECT DB
 		//=============================================================
 		db := db.Connect()
+		defer db.Close()
 
 		car_get_id_result, err := GetCarByID(db, car_id)
 		if err != nil && err != sql.ErrNoRows {
@@ -264,7 +266,6 @@ func Car(router *gin.Engine) {
 
 		// ASSEMBLY RESPONSE
 		//=============================================================
-		defer db.Close()
 		data := Response{
 			Message: "Success",
 		}

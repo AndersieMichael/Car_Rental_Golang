@@ -20,6 +20,7 @@ func Customer(router *gin.Engine) {
 		// CONNECT DB
 		//=============================================================
 		db := db.Connect()
+		defer db.Close()
 
 		//get customer
 
@@ -37,7 +38,6 @@ func Customer(router *gin.Engine) {
 		}
 		// ASSEMBLY RESPONSE
 		//=============================================================
-		defer db.Close()
 		data := Response{
 			Message: "Success",
 			Data:    result,
@@ -55,6 +55,7 @@ func Customer(router *gin.Engine) {
 		// CONNECT DB
 		//=============================================================
 		db := db.Connect()
+		defer db.Close()
 		c_id, _ := strconv.Atoi(id)
 
 		//get customer by id
@@ -85,7 +86,6 @@ func Customer(router *gin.Engine) {
 		}
 		// ASSEMBLY RESPONSE
 		//=============================================================
-		defer db.Close()
 		data := Response{
 			Message: "Success",
 			Data:    result,
@@ -118,6 +118,8 @@ func Customer(router *gin.Engine) {
 		// CONNECT DB
 		//=============================================================
 		db := db.Connect()
+		defer db.Close()
+
 		result, err := addCustomer(db, body)
 		if err != nil {
 			data := Response{
@@ -133,7 +135,6 @@ func Customer(router *gin.Engine) {
 
 		// ASSEMBLY RESPONSE
 		//=============================================================
-		defer db.Close()
 		data := Response{
 			Message: "Success",
 			Data:    result,
@@ -167,6 +168,7 @@ func Customer(router *gin.Engine) {
 		// CONNECT DB
 		//=============================================================
 		db := db.Connect()
+		defer db.Close()
 
 		//checking customer id
 
@@ -213,7 +215,6 @@ func Customer(router *gin.Engine) {
 		}
 		// ASSEMBLY RESPONSE
 		//=============================================================
-		defer db.Close()
 		data := Response{
 			Message: "Success",
 		}
@@ -229,6 +230,7 @@ func Customer(router *gin.Engine) {
 		// CONNECT DB
 		//=============================================================
 		db := db.Connect()
+		defer db.Close()
 
 		check_customer_result, err := getCustomerByID(db, c_id)
 		if err != nil && err != sql.ErrNoRows {
@@ -274,7 +276,6 @@ func Customer(router *gin.Engine) {
 
 		// ASSEMBLY RESPONSE
 		//=============================================================
-		defer db.Close()
 		data := Response{
 			Message: "Success",
 		}
