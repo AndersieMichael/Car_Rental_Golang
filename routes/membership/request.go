@@ -1,4 +1,4 @@
-package car
+package membership
 
 import (
 	"database/sql"
@@ -11,100 +11,105 @@ import (
 	"github.com/gin-gonic/gin/binding"
 )
 
-func Car(router *gin.Engine) {
-	route := router.Group("/car")
+func Membership(router *gin.Engine){
+	route := router.Group("/membership")
 
-
-	// GET CAR
+	// GET MEMBERSHIP
 	//=============================================================	
-	route.GET("/get", func(c *gin.Context) {
+	route.GET("/get",func (c *gin.Context)  {
 		// CONNECT DB
 		//=============================================================
 		db := db.Connect()
 
-		result, err := getCar(db)
+		membership_get_result, err := getMembership(db)
 		if err != nil {
 			data := Response{
 				Message:       "Failed",
 				Error_Key:     "error_internal_server",
-				Error_Message: "error in getCar function",
+				Error_Message: "error in getMembership function",
 			}
-			webhook.PostToWebHook(c.Request.Method, c.Request.Host+c.Request.URL.Path, data.Error_Key, err.Error(), "car | request.go | get")
+			webhook.PostToWebHook(c.Request.Method, c.Request.Host+c.Request.URL.Path, data.Error_Key, err.Error(), "membership | request.go | get")
 			Err.HandleError(err)
 			c.JSON(200, data)
 			return //END
 		}
-
 		// ASSEMBLY RESPONSE
 		//=============================================================
 		defer db.Close()
 		data := Response{
 			Message: "Success",
-			Data:    result,
+			Data:    membership_get_result,
 		}
 
 		c.JSON(200, data)
+
 	})
 
-	// GET CAR BY ID
-	//=============================================================		
-	route.GET("/get/:id", func(c *gin.Context) {
+
+	// GET MEMBERSHIP BY ID
+	//=============================================================	
+	route.GET("/get/:id",func (c *gin.Context)  {
+
 		id := c.Param("id")
-		car_id, _ := strconv.Atoi(id)
+		
+		member_id,_ := strconv.Atoi(id)
 
 		// CONNECT DB
 		//=============================================================
 		db := db.Connect()
-		result, err := GetCarByID(db, car_id)
-		if err != nil && err != sql.ErrNoRows {
+
+		membership_get_id_result, err := GetMembershipByID(db,member_id)
+
+		if err != nil && err != sql.ErrNoRows  {
 			data := Response{
 				Message:       "Failed",
 				Error_Key:     "error_internal_server",
-				Error_Message: "error in getCarByID function",
+				Error_Message: "error in getMembershipByID function",
 			}
-			webhook.PostToWebHook(c.Request.Method, c.Request.Host+c.Request.URL.Path, data.Error_Key, err.Error(), "car | request.go | get/id")
+			webhook.PostToWebHook(c.Request.Method, c.Request.Host+c.Request.URL.Path, data.Error_Key, err.Error(), "membership | request.go | get/id")
 			Err.HandleError(err)
 			c.JSON(200, data)
 			return //END
 		}
 
-		// check if CAR not exist
-		if result.Car_ID == 0 {
+		// check if membership not exist
+		if membership_get_id_result.Membership_ID == 0 {
 			data := Response{
 				Message:       "Failed",
 				Error_Key:     "error_id_not_found",
-				Error_Message: "error Car not Found",
+				Error_Message: "error membership not Found",
 			}
-			webhook.PostToWebHook(c.Request.Method, c.Request.Host+c.Request.URL.Path, data.Error_Key, data.Error_Message, "car | request.go | get/id")
+			webhook.PostToWebHook(c.Request.Method, c.Request.Host+c.Request.URL.Path, data.Error_Key, data.Error_Message, "membership | request.go | get/id")
 			Err.HandleError(err)
 			c.JSON(200, data)
 			return //END
-		}
+		}				
 
 		// ASSEMBLY RESPONSE
 		//=============================================================
 		defer db.Close()
 		data := Response{
 			Message: "Success",
-			Data:    result,
+			Data:    membership_get_id_result,
 		}
 
 		c.JSON(200, data)
-	})
 
-	// ADD CAR
-	//=============================================================		
-	route.POST("/add", func(c *gin.Context) {
-		var body CarForm
+	})	
+	
+	// ADD MEMBERSHIP
+	//=============================================================	
+	route.POST("/add",func(c *gin.Context) {
+		var body MembershipFormat
 
-		err := c.ShouldBindBodyWith(&body, binding.JSON)
-		if err != nil {
+		err := c.ShouldBindBodyWith(&body,binding.JSON)
+		if err!=nil{
 			data := Response{
 				Message:       "Failed",
 				Error_Key:     "error_param",
 				Error_Message: err.Error(),
 			}
-			webhook.PostToWebHook(c.Request.Method, c.Request.Host+c.Request.URL.Path, data.Error_Key, err.Error(), "car | request.go | add")
+			webhook.PostToWebHook(c.Request.Method, c.Request.Host+c.Request.URL.Path, data.Error_Key, err.Error(), "membership | request.go | add")
 			Err.HandleError(err)
 			c.JSON(200, data)
 			return //END
@@ -113,15 +118,15 @@ func Car(router *gin.Engine) {
 		// CONNECT DB
 		//=============================================================
 		db := db.Connect()
-
-		car_add_result, err := addCar(db, body)
+		
+		membership_add_result, err := addMembership(db,body)
 		if err != nil {
 			data := Response{
 				Message:       "Failed",
 				Error_Key:     "error_internal_server",
-				Error_Message: "error in addCar function",
+				Error_Message: "error in addMembership function",
 			}
-			webhook.PostToWebHook(c.Request.Method, c.Request.Host+c.Request.URL.Path, data.Error_Key, err.Error(), "car | request.go | add")
+			webhook.PostToWebHook(c.Request.Method, c.Request.Host+c.Request.URL.Path, data.Error_Key, err.Error(), "membership | request.go | get")
 			Err.HandleError(err)
 			c.JSON(200, data)
 			return //END
@@ -132,28 +137,29 @@ func Car(router *gin.Engine) {
 		defer db.Close()
 		data := Response{
 			Message: "Success",
-			Data:    car_add_result,
+			Data:    membership_add_result,
 		}
-		c.JSON(200, data)
+		c.JSON(200, data)		
+		
 	})
 
-	// UPDATE CAR
+	// UPDATE MEMBERSHIP
 	//=============================================================		
 	route.PUT("/update/:id", func(c *gin.Context) {
 		id := c.Param("id")
+		
+		var body MembershipFormat
 
-		var body CarForm
+		member_id, _ := strconv.Atoi(id)
 
-		car_id, _ := strconv.Atoi(id)
-
-		err := c.ShouldBindBodyWith(&body, binding.JSON)
-		if err != nil {
+		err := c.ShouldBindBodyWith(&body,binding.JSON)
+		if err!=nil{
 			data := Response{
 				Message:       "Failed",
 				Error_Key:     "error_param",
 				Error_Message: err.Error(),
 			}
-			webhook.PostToWebHook(c.Request.Method, c.Request.Host+c.Request.URL.Path, data.Error_Key, err.Error(), "car | request.go | update")
+			webhook.PostToWebHook(c.Request.Method, c.Request.Host+c.Request.URL.Path, data.Error_Key, err.Error(), "membership | request.go | update")
 			Err.HandleError(err)
 			c.JSON(200, data)
 			return //END
@@ -162,41 +168,41 @@ func Car(router *gin.Engine) {
 		// CONNECT DB
 		//=============================================================
 		db := db.Connect()
-
-		car_get_id_result, err := GetCarByID(db, car_id)
+		
+		membership_get_id_result, err := GetMembershipByID(db,member_id)
 		if err != nil && err != sql.ErrNoRows {
 			data := Response{
 				Message:       "Failed",
 				Error_Key:     "error_internal_server",
-				Error_Message: "error in getCarByID function",
+				Error_Message: "error in getMembershipByID function",
 			}
-			webhook.PostToWebHook(c.Request.Method, c.Request.Host+c.Request.URL.Path, data.Error_Key, err.Error(), "car | request.go | update")
+			webhook.PostToWebHook(c.Request.Method, c.Request.Host+c.Request.URL.Path, data.Error_Key, err.Error(), "membership | request.go | update")
 			Err.HandleError(err)
 			c.JSON(200, data)
 			return //END
 		}
 
-		// check if CAR not exist
-		if car_get_id_result.Car_ID == 0 {
+		// check if membership not exist
+		if membership_get_id_result.Membership_ID == 0 {
 			data := Response{
 				Message:       "Failed",
 				Error_Key:     "error_id_not_found",
-				Error_Message: "error Car not Found",
+				Error_Message: "error membership not Found",
 			}
-			webhook.PostToWebHook(c.Request.Method, c.Request.Host+c.Request.URL.Path, data.Error_Key, data.Error_Message, "car | request.go | update")
+			webhook.PostToWebHook(c.Request.Method, c.Request.Host+c.Request.URL.Path, data.Error_Key, data.Error_Message, "membership | request.go | update")
 			Err.HandleError(err)
 			c.JSON(200, data)
 			return //END
 		}
 
-		err = updateCar(db, car_id, body)
+		err = updateMembership(db,member_id,body)
 		if err != nil {
 			data := Response{
 				Message:       "Failed",
 				Error_Key:     "error_internal_server",
-				Error_Message: "error in updateCar function",
+				Error_Message: "error in updateMembership function",
 			}
-			webhook.PostToWebHook(c.Request.Method, c.Request.Host+c.Request.URL.Path, data.Error_Key, err.Error(), "car | request.go | update")
+			webhook.PostToWebHook(c.Request.Method, c.Request.Host+c.Request.URL.Path, data.Error_Key, err.Error(), "membership | request.go | update")
 			Err.HandleError(err)
 			c.JSON(200, data)
 			return //END
@@ -208,55 +214,56 @@ func Car(router *gin.Engine) {
 		data := Response{
 			Message: "Success",
 		}
-		c.JSON(200, data)
+		c.JSON(200, data)		
+
 	})
 
-	// DELETE CAR
+
+	// DELETE MEMBERSHIP
 	//=============================================================		
 	route.DELETE("/delete/:id", func(c *gin.Context) {
 		id := c.Param("id")
 
-		car_id, _ := strconv.Atoi(id)
+		member_id, _ := strconv.Atoi(id)
 
 		// CONNECT DB
 		//=============================================================
 		db := db.Connect()
-
-		car_get_id_result, err := GetCarByID(db, car_id)
+		
+		membership_get_id_result, err := GetMembershipByID(db,member_id)
 		if err != nil && err != sql.ErrNoRows {
 			data := Response{
 				Message:       "Failed",
 				Error_Key:     "error_internal_server",
-				Error_Message: "error in getCarByID function",
+				Error_Message: "error in getMembershipByID function",
 			}
-			webhook.PostToWebHook(c.Request.Method, c.Request.Host+c.Request.URL.Path, data.Error_Key, err.Error(), "car | request.go | delete")
+			webhook.PostToWebHook(c.Request.Method, c.Request.Host+c.Request.URL.Path, data.Error_Key, err.Error(), "membership | request.go | delete")
 			Err.HandleError(err)
 			c.JSON(200, data)
 			return //END
 		}
 
-		// check if CAR not exist
-		if car_get_id_result.Car_ID == 0 {
+		// check if membership not exist
+		if membership_get_id_result.Membership_ID == 0 {
 			data := Response{
 				Message:       "Failed",
 				Error_Key:     "error_id_not_found",
-				Error_Message: "error Car not Found",
+				Error_Message: "error membership not Found",
 			}
-			webhook.PostToWebHook(c.Request.Method, c.Request.Host+c.Request.URL.Path, data.Error_Key, data.Error_Message, "car | request.go | delete")
+			webhook.PostToWebHook(c.Request.Method, c.Request.Host+c.Request.URL.Path, data.Error_Key, data.Error_Message, "membership | request.go | delete")
 			Err.HandleError(err)
 			c.JSON(200, data)
 			return //END
 		}
 
-		err = deleteCar(db, car_id)
-
+		err = deleteMembership(db,member_id)
 		if err != nil {
 			data := Response{
 				Message:       "Failed",
 				Error_Key:     "error_internal_server",
-				Error_Message: "error in deleteCar function",
+				Error_Message: "error in deleteMembership function",
 			}
-			webhook.PostToWebHook(c.Request.Method, c.Request.Host+c.Request.URL.Path, data.Error_Key, err.Error(), "car | request.go | delete")
+			webhook.PostToWebHook(c.Request.Method, c.Request.Host+c.Request.URL.Path, data.Error_Key, err.Error(), "membership | request.go | delete")
 			Err.HandleError(err)
 			c.JSON(200, data)
 			return //END
@@ -268,6 +275,8 @@ func Car(router *gin.Engine) {
 		data := Response{
 			Message: "Success",
 		}
-		c.JSON(200, data)
+		c.JSON(200, data)			
 	})
+
+
 }

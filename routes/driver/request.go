@@ -1,4 +1,4 @@
-package car
+package driver
 
 import (
 	"database/sql"
@@ -11,71 +11,72 @@ import (
 	"github.com/gin-gonic/gin/binding"
 )
 
-func Car(router *gin.Engine) {
-	route := router.Group("/car")
+func Driver(router *gin.Engine){
+	parent := "/driver"
+	route := router.Group(parent)
 
-
-	// GET CAR
+	// GET Driver
 	//=============================================================	
-	route.GET("/get", func(c *gin.Context) {
+	route.GET("/get",func(c *gin.Context) {
 		// CONNECT DB
 		//=============================================================
-		db := db.Connect()
-
-		result, err := getCar(db)
+		db := db.Connect()	
+		
+		driver_get_result, err := getDriver(db)
 		if err != nil {
 			data := Response{
 				Message:       "Failed",
 				Error_Key:     "error_internal_server",
-				Error_Message: "error in getCar function",
+				Error_Message: "error in getDriver function",
 			}
-			webhook.PostToWebHook(c.Request.Method, c.Request.Host+c.Request.URL.Path, data.Error_Key, err.Error(), "car | request.go | get")
+			webhook.PostToWebHook(c.Request.Method, c.Request.Host+c.Request.URL.Path, data.Error_Key, err.Error(), parent + " | request.go | get")
 			Err.HandleError(err)
 			c.JSON(200, data)
 			return //END
 		}
-
 		// ASSEMBLY RESPONSE
 		//=============================================================
 		defer db.Close()
 		data := Response{
 			Message: "Success",
-			Data:    result,
+			Data:    driver_get_result,
 		}
 
 		c.JSON(200, data)
+
 	})
 
-	// GET CAR BY ID
-	//=============================================================		
+	// GET DRIVER BY ID
+	//=============================================================	
 	route.GET("/get/:id", func(c *gin.Context) {
 		id := c.Param("id")
-		car_id, _ := strconv.Atoi(id)
+		driver_id,_ := strconv.Atoi(id)
 
 		// CONNECT DB
 		//=============================================================
 		db := db.Connect()
-		result, err := GetCarByID(db, car_id)
+
+		driver_get_id_result, err := GetDriverByID(db,driver_id)
 		if err != nil && err != sql.ErrNoRows {
 			data := Response{
 				Message:       "Failed",
 				Error_Key:     "error_internal_server",
-				Error_Message: "error in getCarByID function",
+				Error_Message: "error in getDriverByID function",
 			}
-			webhook.PostToWebHook(c.Request.Method, c.Request.Host+c.Request.URL.Path, data.Error_Key, err.Error(), "car | request.go | get/id")
+			webhook.PostToWebHook(c.Request.Method, c.Request.Host+c.Request.URL.Path, data.Error_Key, err.Error(), parent +" | request.go | get/id")
 			Err.HandleError(err)
 			c.JSON(200, data)
 			return //END
 		}
 
-		// check if CAR not exist
-		if result.Car_ID == 0 {
+		// check if Driver not exist
+		if driver_get_id_result.Driver_ID == 0 {
 			data := Response{
 				Message:       "Failed",
 				Error_Key:     "error_id_not_found",
-				Error_Message: "error Car not Found",
+				Error_Message: "error Driver not Found",
 			}
-			webhook.PostToWebHook(c.Request.Method, c.Request.Host+c.Request.URL.Path, data.Error_Key, data.Error_Message, "car | request.go | get/id")
+			webhook.PostToWebHook(c.Request.Method, c.Request.Host+c.Request.URL.Path, data.Error_Key, data.Error_Message, parent + " | request.go | get/id")
 			Err.HandleError(err)
 			c.JSON(200, data)
 			return //END
@@ -86,25 +87,25 @@ func Car(router *gin.Engine) {
 		defer db.Close()
 		data := Response{
 			Message: "Success",
-			Data:    result,
+			Data:    driver_get_id_result,
 		}
 
 		c.JSON(200, data)
 	})
 
-	// ADD CAR
-	//=============================================================		
-	route.POST("/add", func(c *gin.Context) {
-		var body CarForm
+	// ADD DRIVER
+	//=============================================================	
+	route.POST("/add",func(c *gin.Context) {
+		var body DriverForm
 
-		err := c.ShouldBindBodyWith(&body, binding.JSON)
-		if err != nil {
+		err := c.ShouldBindBodyWith(&body,binding.JSON)
+		if err!=nil{
 			data := Response{
 				Message:       "Failed",
 				Error_Key:     "error_param",
 				Error_Message: err.Error(),
 			}
-			webhook.PostToWebHook(c.Request.Method, c.Request.Host+c.Request.URL.Path, data.Error_Key, err.Error(), "car | request.go | add")
+			webhook.PostToWebHook(c.Request.Method, c.Request.Host+c.Request.URL.Path, data.Error_Key, err.Error(), parent + " | request.go | add")
 			Err.HandleError(err)
 			c.JSON(200, data)
 			return //END
@@ -113,15 +114,15 @@ func Car(router *gin.Engine) {
 		// CONNECT DB
 		//=============================================================
 		db := db.Connect()
-
-		car_add_result, err := addCar(db, body)
+		
+		driver_add_result, err := addDriver(db,body)
 		if err != nil {
 			data := Response{
 				Message:       "Failed",
 				Error_Key:     "error_internal_server",
-				Error_Message: "error in addCar function",
+				Error_Message: "error in addDriver function",
 			}
-			webhook.PostToWebHook(c.Request.Method, c.Request.Host+c.Request.URL.Path, data.Error_Key, err.Error(), "car | request.go | add")
+			webhook.PostToWebHook(c.Request.Method, c.Request.Host+c.Request.URL.Path, data.Error_Key, err.Error(), parent + " | request.go | get")
 			Err.HandleError(err)
 			c.JSON(200, data)
 			return //END
@@ -132,28 +133,29 @@ func Car(router *gin.Engine) {
 		defer db.Close()
 		data := Response{
 			Message: "Success",
-			Data:    car_add_result,
+			Data:    driver_add_result,
 		}
-		c.JSON(200, data)
+		c.JSON(200, data)		
+		
 	})
-
-	// UPDATE CAR
+	
+	// UPDATE DRIVER
 	//=============================================================		
 	route.PUT("/update/:id", func(c *gin.Context) {
 		id := c.Param("id")
+		
+		var body DriverForm
 
-		var body CarForm
+		driver_id, _ := strconv.Atoi(id)
 
-		car_id, _ := strconv.Atoi(id)
-
-		err := c.ShouldBindBodyWith(&body, binding.JSON)
-		if err != nil {
+		err := c.ShouldBindBodyWith(&body,binding.JSON)
+		if err!=nil{
 			data := Response{
 				Message:       "Failed",
 				Error_Key:     "error_param",
 				Error_Message: err.Error(),
 			}
-			webhook.PostToWebHook(c.Request.Method, c.Request.Host+c.Request.URL.Path, data.Error_Key, err.Error(), "car | request.go | update")
+			webhook.PostToWebHook(c.Request.Method, c.Request.Host+c.Request.URL.Path, data.Error_Key, err.Error(), parent + " | request.go | update")
 			Err.HandleError(err)
 			c.JSON(200, data)
 			return //END
@@ -162,41 +164,41 @@ func Car(router *gin.Engine) {
 		// CONNECT DB
 		//=============================================================
 		db := db.Connect()
-
-		car_get_id_result, err := GetCarByID(db, car_id)
+		
+		driver_get_id_result, err := GetDriverByID(db,driver_id)
 		if err != nil && err != sql.ErrNoRows {
 			data := Response{
 				Message:       "Failed",
 				Error_Key:     "error_internal_server",
-				Error_Message: "error in getCarByID function",
+				Error_Message: "error in getDriverByID function",
 			}
-			webhook.PostToWebHook(c.Request.Method, c.Request.Host+c.Request.URL.Path, data.Error_Key, err.Error(), "car | request.go | update")
+			webhook.PostToWebHook(c.Request.Method, c.Request.Host+c.Request.URL.Path, data.Error_Key, err.Error(), parent + " | request.go | update")
 			Err.HandleError(err)
 			c.JSON(200, data)
 			return //END
 		}
 
-		// check if CAR not exist
-		if car_get_id_result.Car_ID == 0 {
+		// check if Driver not exist
+		if driver_get_id_result.Driver_ID == 0 {
 			data := Response{
 				Message:       "Failed",
 				Error_Key:     "error_id_not_found",
-				Error_Message: "error Car not Found",
+				Error_Message: "error Driver not Found",
 			}
-			webhook.PostToWebHook(c.Request.Method, c.Request.Host+c.Request.URL.Path, data.Error_Key, data.Error_Message, "car | request.go | update")
+			webhook.PostToWebHook(c.Request.Method, c.Request.Host+c.Request.URL.Path, data.Error_Key, data.Error_Message,  parent + " | request.go | update")
 			Err.HandleError(err)
 			c.JSON(200, data)
 			return //END
 		}
 
-		err = updateCar(db, car_id, body)
+		err = updateDriver(db,driver_id,body)
 		if err != nil {
 			data := Response{
 				Message:       "Failed",
 				Error_Key:     "error_internal_server",
-				Error_Message: "error in updateCar function",
+				Error_Message: "error in updateDriver function",
 			}
-			webhook.PostToWebHook(c.Request.Method, c.Request.Host+c.Request.URL.Path, data.Error_Key, err.Error(), "car | request.go | update")
+			webhook.PostToWebHook(c.Request.Method, c.Request.Host+c.Request.URL.Path, data.Error_Key, err.Error(),  parent + " | request.go | update")
 			Err.HandleError(err)
 			c.JSON(200, data)
 			return //END
@@ -208,55 +210,55 @@ func Car(router *gin.Engine) {
 		data := Response{
 			Message: "Success",
 		}
-		c.JSON(200, data)
+		c.JSON(200, data)		
+
 	})
 
-	// DELETE CAR
+	// DELETE DRIVER
 	//=============================================================		
 	route.DELETE("/delete/:id", func(c *gin.Context) {
 		id := c.Param("id")
 
-		car_id, _ := strconv.Atoi(id)
+		driver_id, _ := strconv.Atoi(id)
 
 		// CONNECT DB
 		//=============================================================
 		db := db.Connect()
-
-		car_get_id_result, err := GetCarByID(db, car_id)
+		
+		driver_get_id_result, err := GetDriverByID(db,driver_id)
 		if err != nil && err != sql.ErrNoRows {
 			data := Response{
 				Message:       "Failed",
 				Error_Key:     "error_internal_server",
-				Error_Message: "error in getCarByID function",
+				Error_Message: "error in getDriverByID function",
 			}
-			webhook.PostToWebHook(c.Request.Method, c.Request.Host+c.Request.URL.Path, data.Error_Key, err.Error(), "car | request.go | delete")
+			webhook.PostToWebHook(c.Request.Method, c.Request.Host+c.Request.URL.Path, data.Error_Key, err.Error(), parent + " | request.go | delete")
 			Err.HandleError(err)
 			c.JSON(200, data)
 			return //END
 		}
 
-		// check if CAR not exist
-		if car_get_id_result.Car_ID == 0 {
+		// check if Driver not exist
+		if driver_get_id_result.Driver_ID == 0 {
 			data := Response{
 				Message:       "Failed",
 				Error_Key:     "error_id_not_found",
-				Error_Message: "error Car not Found",
+				Error_Message: "error driver not Found",
 			}
-			webhook.PostToWebHook(c.Request.Method, c.Request.Host+c.Request.URL.Path, data.Error_Key, data.Error_Message, "car | request.go | delete")
+			webhook.PostToWebHook(c.Request.Method, c.Request.Host+c.Request.URL.Path, data.Error_Key, data.Error_Message, parent + " | request.go | delete")
 			Err.HandleError(err)
 			c.JSON(200, data)
 			return //END
 		}
 
-		err = deleteCar(db, car_id)
-
+		err = deleteDriver(db,driver_id)
 		if err != nil {
 			data := Response{
 				Message:       "Failed",
 				Error_Key:     "error_internal_server",
-				Error_Message: "error in deleteCar function",
+				Error_Message: "error in deleteDriver function",
 			}
-			webhook.PostToWebHook(c.Request.Method, c.Request.Host+c.Request.URL.Path, data.Error_Key, err.Error(), "car | request.go | delete")
+			webhook.PostToWebHook(c.Request.Method, c.Request.Host+c.Request.URL.Path, data.Error_Key, err.Error(), parent + " | request.go | delete")
 			Err.HandleError(err)
 			c.JSON(200, data)
 			return //END
@@ -268,6 +270,8 @@ func Car(router *gin.Engine) {
 		data := Response{
 			Message: "Success",
 		}
-		c.JSON(200, data)
+		c.JSON(200, data)			
 	})
+
+
 }

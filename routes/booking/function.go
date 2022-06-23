@@ -110,6 +110,47 @@ func addBooking(tx *sqlx.DB, input BookingForm) (int, error) {
 	return id, err
 }
 
+//ADD BOOKING
+//=============================================================
+func addBookingV2(tx *sqlx.DB, input BookingFormV2,
+	startT string,
+	endT string,
+	total_cost int,
+	discount int,
+	total_driver_cost int) (int, error) {
+
+	query := (`insert into booking (customer_id,
+			cars_id,
+			start_time,
+			end_time,
+			total_cost,
+			finished,
+			discount,
+			booktype_id,
+			driver_id,
+			total_driver_cost)
+			Values ($1,	$2,	$3,	$4,	$5,	$6,	$7,	$8,	$9,	$10)
+			returning "booking_id"`)
+	values := []interface{}{
+		input.Customer_ID ,
+		input.Cars_ID ,
+		startT ,
+		endT ,
+		total_cost ,
+		input.Finished ,
+		discount ,
+		input.Booktype_ID ,
+		input.Driver_ID ,
+		total_driver_cost,
+	}
+	var id int
+	err := tx.QueryRowx(query, values...).Scan(&id)
+	if err != nil {
+		return id, err
+	}
+	return id, err
+}
+
 //UPDATE BOOKING
 //=============================================================
 func updateBooking(tx *sqlx.DB, id int, input BookingForm) error {

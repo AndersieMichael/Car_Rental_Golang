@@ -1,4 +1,4 @@
-package car
+package driver_incentive
 
 import (
 	"database/sql"
@@ -11,71 +11,72 @@ import (
 	"github.com/gin-gonic/gin/binding"
 )
 
-func Car(router *gin.Engine) {
-	route := router.Group("/car")
+func Incentive(router *gin.Engine) {
+	parent := "/incentive"
+	route := router.Group(parent)
 
-
-	// GET CAR
-	//=============================================================	
+	// GET INCENTIVE
+	//=============================================================
 	route.GET("/get", func(c *gin.Context) {
 		// CONNECT DB
 		//=============================================================
 		db := db.Connect()
 
-		result, err := getCar(db)
+		incentive_get_result, err := getIncentive(db)
 		if err != nil {
 			data := Response{
 				Message:       "Failed",
 				Error_Key:     "error_internal_server",
-				Error_Message: "error in getCar function",
+				Error_Message: "error in getIncentive function",
 			}
-			webhook.PostToWebHook(c.Request.Method, c.Request.Host+c.Request.URL.Path, data.Error_Key, err.Error(), "car | request.go | get")
+			webhook.PostToWebHook(c.Request.Method, c.Request.Host+c.Request.URL.Path, data.Error_Key, err.Error(), parent+" | request.go | get")
 			Err.HandleError(err)
 			c.JSON(200, data)
 			return //END
 		}
-
 		// ASSEMBLY RESPONSE
 		//=============================================================
 		defer db.Close()
 		data := Response{
 			Message: "Success",
-			Data:    result,
+			Data:    incentive_get_result,
 		}
 
 		c.JSON(200, data)
+
 	})
 
-	// GET CAR BY ID
-	//=============================================================		
+	// GET INCENTIVE BY ID
+	//=============================================================
 	route.GET("/get/:id", func(c *gin.Context) {
 		id := c.Param("id")
-		car_id, _ := strconv.Atoi(id)
+		incentive_id, _ := strconv.Atoi(id)
 
 		// CONNECT DB
 		//=============================================================
 		db := db.Connect()
-		result, err := GetCarByID(db, car_id)
+
+		incentive_get_id_result, err := getIncentiveByID(db, incentive_id)
 		if err != nil && err != sql.ErrNoRows {
 			data := Response{
 				Message:       "Failed",
 				Error_Key:     "error_internal_server",
-				Error_Message: "error in getCarByID function",
+				Error_Message: "error in getIncentiveByID function",
 			}
-			webhook.PostToWebHook(c.Request.Method, c.Request.Host+c.Request.URL.Path, data.Error_Key, err.Error(), "car | request.go | get/id")
+			webhook.PostToWebHook(c.Request.Method, c.Request.Host+c.Request.URL.Path, data.Error_Key, err.Error(), parent+" | request.go | get/id")
 			Err.HandleError(err)
 			c.JSON(200, data)
 			return //END
 		}
 
-		// check if CAR not exist
-		if result.Car_ID == 0 {
+		// check if Incentive not exist
+		if incentive_get_id_result.Driver_incentive_ID == 0 {
 			data := Response{
 				Message:       "Failed",
 				Error_Key:     "error_id_not_found",
-				Error_Message: "error Car not Found",
+				Error_Message: "error incentive not Found",
 			}
-			webhook.PostToWebHook(c.Request.Method, c.Request.Host+c.Request.URL.Path, data.Error_Key, data.Error_Message, "car | request.go | get/id")
+			webhook.PostToWebHook(c.Request.Method, c.Request.Host+c.Request.URL.Path, data.Error_Key, data.Error_Message, parent+" | request.go | get/id")
 			Err.HandleError(err)
 			c.JSON(200, data)
 			return //END
@@ -86,16 +87,16 @@ func Car(router *gin.Engine) {
 		defer db.Close()
 		data := Response{
 			Message: "Success",
-			Data:    result,
+			Data:    incentive_get_id_result,
 		}
 
 		c.JSON(200, data)
 	})
 
-	// ADD CAR
-	//=============================================================		
+	// ADD INCENTIVE
+	//=============================================================
 	route.POST("/add", func(c *gin.Context) {
-		var body CarForm
+		var body IncentiveForm
 
 		err := c.ShouldBindBodyWith(&body, binding.JSON)
 		if err != nil {
@@ -104,7 +105,7 @@ func Car(router *gin.Engine) {
 				Error_Key:     "error_param",
 				Error_Message: err.Error(),
 			}
-			webhook.PostToWebHook(c.Request.Method, c.Request.Host+c.Request.URL.Path, data.Error_Key, err.Error(), "car | request.go | add")
+			webhook.PostToWebHook(c.Request.Method, c.Request.Host+c.Request.URL.Path, data.Error_Key, err.Error(), parent+" | request.go | add")
 			Err.HandleError(err)
 			c.JSON(200, data)
 			return //END
@@ -114,14 +115,14 @@ func Car(router *gin.Engine) {
 		//=============================================================
 		db := db.Connect()
 
-		car_add_result, err := addCar(db, body)
+		incentive_add_result, err := AddIncentive(db, body)
 		if err != nil {
 			data := Response{
 				Message:       "Failed",
 				Error_Key:     "error_internal_server",
-				Error_Message: "error in addCar function",
+				Error_Message: "error in addIncentive function",
 			}
-			webhook.PostToWebHook(c.Request.Method, c.Request.Host+c.Request.URL.Path, data.Error_Key, err.Error(), "car | request.go | add")
+			webhook.PostToWebHook(c.Request.Method, c.Request.Host+c.Request.URL.Path, data.Error_Key, err.Error(), parent+" | request.go | get")
 			Err.HandleError(err)
 			c.JSON(200, data)
 			return //END
@@ -132,19 +133,20 @@ func Car(router *gin.Engine) {
 		defer db.Close()
 		data := Response{
 			Message: "Success",
-			Data:    car_add_result,
+			Data:    incentive_add_result,
 		}
 		c.JSON(200, data)
+
 	})
 
-	// UPDATE CAR
-	//=============================================================		
+	// UPDATE INCENTIVE
+	//=============================================================
 	route.PUT("/update/:id", func(c *gin.Context) {
 		id := c.Param("id")
 
-		var body CarForm
+		var body IncentiveForm
 
-		car_id, _ := strconv.Atoi(id)
+		incentive_id, _ := strconv.Atoi(id)
 
 		err := c.ShouldBindBodyWith(&body, binding.JSON)
 		if err != nil {
@@ -153,7 +155,7 @@ func Car(router *gin.Engine) {
 				Error_Key:     "error_param",
 				Error_Message: err.Error(),
 			}
-			webhook.PostToWebHook(c.Request.Method, c.Request.Host+c.Request.URL.Path, data.Error_Key, err.Error(), "car | request.go | update")
+			webhook.PostToWebHook(c.Request.Method, c.Request.Host+c.Request.URL.Path, data.Error_Key, err.Error(), parent+" | request.go | update")
 			Err.HandleError(err)
 			c.JSON(200, data)
 			return //END
@@ -163,40 +165,40 @@ func Car(router *gin.Engine) {
 		//=============================================================
 		db := db.Connect()
 
-		car_get_id_result, err := GetCarByID(db, car_id)
+		incentive_get_id_result, err := getIncentiveByID(db, incentive_id)
 		if err != nil && err != sql.ErrNoRows {
 			data := Response{
 				Message:       "Failed",
 				Error_Key:     "error_internal_server",
-				Error_Message: "error in getCarByID function",
+				Error_Message: "error in getIncentiveByID function",
 			}
-			webhook.PostToWebHook(c.Request.Method, c.Request.Host+c.Request.URL.Path, data.Error_Key, err.Error(), "car | request.go | update")
+			webhook.PostToWebHook(c.Request.Method, c.Request.Host+c.Request.URL.Path, data.Error_Key, err.Error(), parent+" | request.go | update")
 			Err.HandleError(err)
 			c.JSON(200, data)
 			return //END
 		}
 
-		// check if CAR not exist
-		if car_get_id_result.Car_ID == 0 {
+		// check if Incentive not exist
+		if incentive_get_id_result.Driver_incentive_ID == 0 {
 			data := Response{
 				Message:       "Failed",
 				Error_Key:     "error_id_not_found",
-				Error_Message: "error Car not Found",
+				Error_Message: "error incentive not Found",
 			}
-			webhook.PostToWebHook(c.Request.Method, c.Request.Host+c.Request.URL.Path, data.Error_Key, data.Error_Message, "car | request.go | update")
+			webhook.PostToWebHook(c.Request.Method, c.Request.Host+c.Request.URL.Path, data.Error_Key, data.Error_Message, parent+" | request.go | update")
 			Err.HandleError(err)
 			c.JSON(200, data)
 			return //END
 		}
 
-		err = updateCar(db, car_id, body)
+		err = updateIncentive(db, incentive_id, body)
 		if err != nil {
 			data := Response{
 				Message:       "Failed",
 				Error_Key:     "error_internal_server",
-				Error_Message: "error in updateCar function",
+				Error_Message: "error in updateIncentive function",
 			}
-			webhook.PostToWebHook(c.Request.Method, c.Request.Host+c.Request.URL.Path, data.Error_Key, err.Error(), "car | request.go | update")
+			webhook.PostToWebHook(c.Request.Method, c.Request.Host+c.Request.URL.Path, data.Error_Key, err.Error(), parent+" | request.go | update")
 			Err.HandleError(err)
 			c.JSON(200, data)
 			return //END
@@ -209,54 +211,54 @@ func Car(router *gin.Engine) {
 			Message: "Success",
 		}
 		c.JSON(200, data)
+
 	})
 
-	// DELETE CAR
-	//=============================================================		
+	// DELETE INCENTIVE
+	//=============================================================
 	route.DELETE("/delete/:id", func(c *gin.Context) {
 		id := c.Param("id")
 
-		car_id, _ := strconv.Atoi(id)
+		incentive_id, _ := strconv.Atoi(id)
 
 		// CONNECT DB
 		//=============================================================
 		db := db.Connect()
 
-		car_get_id_result, err := GetCarByID(db, car_id)
+		incentive_get_id_result, err := getIncentiveByID(db, incentive_id)
 		if err != nil && err != sql.ErrNoRows {
 			data := Response{
 				Message:       "Failed",
 				Error_Key:     "error_internal_server",
-				Error_Message: "error in getCarByID function",
+				Error_Message: "error in getIncentiveByID function",
 			}
-			webhook.PostToWebHook(c.Request.Method, c.Request.Host+c.Request.URL.Path, data.Error_Key, err.Error(), "car | request.go | delete")
+			webhook.PostToWebHook(c.Request.Method, c.Request.Host+c.Request.URL.Path, data.Error_Key, err.Error(), parent+" | request.go | delete")
 			Err.HandleError(err)
 			c.JSON(200, data)
 			return //END
 		}
 
-		// check if CAR not exist
-		if car_get_id_result.Car_ID == 0 {
+		// check if Incentive not exist
+		if incentive_get_id_result.Driver_incentive_ID == 0 {
 			data := Response{
 				Message:       "Failed",
 				Error_Key:     "error_id_not_found",
-				Error_Message: "error Car not Found",
+				Error_Message: "error incentive not Found",
 			}
-			webhook.PostToWebHook(c.Request.Method, c.Request.Host+c.Request.URL.Path, data.Error_Key, data.Error_Message, "car | request.go | delete")
+			webhook.PostToWebHook(c.Request.Method, c.Request.Host+c.Request.URL.Path, data.Error_Key, data.Error_Message, parent+" | request.go | delete")
 			Err.HandleError(err)
 			c.JSON(200, data)
 			return //END
 		}
 
-		err = deleteCar(db, car_id)
-
+		err = deleteIncentive(db, incentive_id)
 		if err != nil {
 			data := Response{
 				Message:       "Failed",
 				Error_Key:     "error_internal_server",
-				Error_Message: "error in deleteCar function",
+				Error_Message: "error in deleteDriver function",
 			}
-			webhook.PostToWebHook(c.Request.Method, c.Request.Host+c.Request.URL.Path, data.Error_Key, err.Error(), "car | request.go | delete")
+			webhook.PostToWebHook(c.Request.Method, c.Request.Host+c.Request.URL.Path, data.Error_Key, err.Error(), parent+" | request.go | delete")
 			Err.HandleError(err)
 			c.JSON(200, data)
 			return //END
@@ -270,4 +272,5 @@ func Car(router *gin.Engine) {
 		}
 		c.JSON(200, data)
 	})
+
 }

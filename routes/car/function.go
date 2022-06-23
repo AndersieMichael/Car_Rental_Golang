@@ -28,7 +28,7 @@ func getCar(tx *sqlx.DB) ([]GetCar, error) {
 
 //GET CAR BY ID
 //
-func getCarByID(tx *sqlx.DB, id int) (GetCar, error) {
+func GetCarByID(tx *sqlx.DB, id int) (GetCar, error) {
 	var (
 		data GetCar
 	)

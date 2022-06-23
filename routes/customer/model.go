@@ -9,14 +9,22 @@ type Response struct {
 }
 
 type GetCustomer struct {
-	Customer_ID  int    `json:"customer_id" db:"customer_id"`
+	Customer_ID  int     `json:"customer_id" db:"customer_id"`
 	Name         *string `json:"name" db:"name"`
 	Nik          *string `json:"nik" db:"nik"`
 	Phone_number *string `json:"phone_number" db:"phone_number"`
 }
 
+type GetCustBooking struct {
+	Customer_ID   int     `json:"customer_id" db:"customer_id"`
+	Membership_ID int    `json:"membership_id" db:"membership_id"`
+	Name          *string `json:"name" db:"name"`
+	Nik           *string `json:"nik" db:"nik"`
+	Phone_number  *string `json:"phone_number" db:"phone_number"`
+}
+
 type CustomerForm struct {
-	Membership_ID *int    `json:"membership_id" binding:"required"`
+	Membership_ID int    `json:"membership_id" binding:"required"`
 	Name          *string `json:"name" binding:"required"`
 	Nik           *string `json:"nik" binding:"required"`
 	Phone_number  *string `json:"phone_number" binding:"required"`

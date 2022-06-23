@@ -122,3 +122,24 @@ func deleteCustomer(tx *sqlx.DB, id int) (error) {
 	}
 	return err
 }
+
+//GET CUSTOMER Booking BY ID
+//
+func GetCustomerBooking(tx *sqlx.DB, id int) (GetCustBooking, error) {
+	var (
+		data  GetCustBooking
+	)
+
+	query := (`select c.customer_id,c.membership_id ,c."name" ,c.nik ,c.phone_number 
+			from "customer" c 
+			where c."customer_id" = $1`)
+
+	values := []interface{}{
+		id,
+	}
+	err := tx.QueryRowx(query, values...).StructScan(&data)
+	if err != nil {
+		return data, err
+	}
+	return data, err
+}
