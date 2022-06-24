@@ -10,7 +10,7 @@ type Response struct {
 
 type GetIncentive struct{
 	Driver_incentive_ID int `json:"driver_incentive_id" db:"driver_incentive_id"`
-	Booking_ID 			int `json:"booking_id" db:"booking_id"`
+	Driver_ID 			int `json:"driver_id" db:"driver_id"`
 	Incentive			int `json:"incentive" db:"incentive"`
 }
 

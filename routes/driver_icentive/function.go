@@ -9,8 +9,8 @@ func getIncentive(tx *sqlx.DB) ([]GetIncentive, error) {
 		data  GetIncentive
 		datas []GetIncentive
 	)
-	query := (`select *
-				from "driver_incentive" d`)
+	query := (`select di.driver_incentive_id ,b.driver_id , di.incentive  from driver_incentive di 
+			join booking b on b.booking_id = di.booking_id `)
 
 	rows, err := tx.Queryx(query)
 	if err != nil {
@@ -34,9 +34,9 @@ func getIncentiveByID(tx *sqlx.DB, id int) (GetIncentive, error) {
 		data GetIncentive
 	)
 
-	query := (`select *
-	from "driver_incentive" d
-	where d."driver_incentive_id" = $1`)
+	query := (`select di.driver_incentive_id ,b.driver_id , di.incentive  from driver_incentive di 
+	join booking b on b.booking_id = di.booking_id 
+	where di."driver_incentive_id" = $1`)
 
 	values := []interface{}{
 		id,

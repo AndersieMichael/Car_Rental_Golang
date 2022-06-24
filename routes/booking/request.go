@@ -4,14 +4,14 @@ import (
 	"database/sql"
 	"golangSecond/routes/car"
 	"golangSecond/routes/customer"
-	inc "golangSecond/routes/driver_icentive"
 	"golangSecond/routes/driver"
+	inc "golangSecond/routes/driver_icentive"
 	"golangSecond/routes/membership"
 	"golangSecond/utilities/db"
 	Err "golangSecond/utilities/error"
 	"golangSecond/utilities/webhook"
+	"math"
 	"strconv"
-	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
@@ -228,17 +228,39 @@ func Booking(router *gin.Engine) {
 			return //END
 		}
 
-		//change from unix
-		startT := time.Unix(body.Start_time, 0).Format("2006-01-02")
-		endT := time.Unix(body.End_time, 0).Format("2006-01-02")
+		//if car stock is empty
+		if car_data_result.Stock == 0 {
+			data := Response{
+				Message:       "Failed",
+				Error_Key:     "error_stock_is_empty",
+				Error_Message: "error Car stock is empty",
+			}
+			webhook.PostToWebHook(c.Request.Method, c.Request.Host+c.Request.URL.Path, data.Error_Key, data.Error_Message, "booking | request.go | add")
+			Err.HandleError(err)
+			c.JSON(200, data)
+			return //END
+		}
 
-		//change to time from string
-		firstT, _ := time.Parse("2006-01-02", (startT))
-		secondT, _ := time.Parse("2006-01-02", (endT))
+		//check if end time lower than start time
+		if body.End_time < body.Start_time {
+			data := Response{
+				Message:       "Failed",
+				Error_Key:     "error_time_range",
+				Error_Message: "end time cannot lower than start time",
+			}
+			webhook.PostToWebHook(c.Request.Method, c.Request.Host+c.Request.URL.Path, data.Error_Key, data.Error_Message, "booking | request.go | add")
+			Err.HandleError(err)
+			c.JSON(200, data)
+			return //END
+		}
+
+		//get days
+		first := math.Ceil(float64(body.Start_time)/(1000*60*60*24)) + 1
+		second := math.Ceil(float64(body.End_time)/(1000*60*60*24)) + 1
 
 		//calculate days range
 		//=============================================================
-		rangeT := (secondT.Sub(firstT).Hours() / 24) + 1
+		rangeT := second - first + 1
 
 		//Calculate total_cost
 		//=============================================================
@@ -343,13 +365,29 @@ func Booking(router *gin.Engine) {
 			return //END
 		}
 
-		
+		// EXECUTE ALL PROCES
+		//=============================================================
+
+		// UPDATE CAR STOCK
+		//=============================================================
+		stock := car_data_result.Stock - 1
+
+		err = car.UpdateCarQuantity(db, *body.Cars_ID, stock)
+		if err != nil {
+			data := Response{
+				Message:       "Failed",
+				Error_Key:     "error_internal_server",
+				Error_Message: "error in UpdateCarQuantity function",
+			}
+			webhook.PostToWebHook(c.Request.Method, c.Request.Host+c.Request.URL.Path, data.Error_Key, err.Error(), "booking | request.go | add")
+			Err.HandleError(err)
+			c.JSON(200, data)
+			return //END
+		}
 
 		// ADD BOOKING DATA
 		//=============================================================
 		book_add_result, err := addBookingV2(db, body,
-			startT,
-			endT,
 			total,
 			discount,
 			driver_payment)
@@ -364,7 +402,7 @@ func Booking(router *gin.Engine) {
 			c.JSON(200, data)
 			return //END
 		}
-		
+
 		if body.Booktype_ID == 2 {
 
 			//CALCULATE INCENTIVE
@@ -375,7 +413,7 @@ func Booking(router *gin.Engine) {
 
 			// ADD INCENTIVE DATA
 			//=============================================================
-			_, err := inc.AddIncentive(db,body2)
+			_, err := inc.AddIncentive(db, body2)
 			if err != nil {
 				data := Response{
 					Message:       "Failed",

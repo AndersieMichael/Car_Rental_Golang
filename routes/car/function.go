@@ -107,3 +107,22 @@ func deleteCar(tx *sqlx.DB, id int) error {
 
 	return err
 }
+
+//UPDATE CAR
+//
+func UpdateCarQuantity(tx *sqlx.DB, id int, stock int) error {
+	query := (`update "cars"
+		set "stock"=$1
+		where cars_id=$2`)
+	values := []interface{}{
+		stock,
+		id,
+	}
+	_, err := tx.Exec(query, values...)
+
+	if err != nil {
+		return err
+	}
+
+	return err
+}

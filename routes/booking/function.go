@@ -113,8 +113,6 @@ func addBooking(tx *sqlx.DB, input BookingForm) (int, error) {
 //ADD BOOKING
 //=============================================================
 func addBookingV2(tx *sqlx.DB, input BookingFormV2,
-	startT string,
-	endT string,
 	total_cost int,
 	discount int,
 	total_driver_cost int) (int, error) {
@@ -134,8 +132,8 @@ func addBookingV2(tx *sqlx.DB, input BookingFormV2,
 	values := []interface{}{
 		input.Customer_ID ,
 		input.Cars_ID ,
-		startT ,
-		endT ,
+		time.Unix(input.Start_time, 0).Format("2006-01-02"),
+		time.Unix(input.End_time, 0).Format("2006-01-02") ,
 		total_cost ,
 		input.Finished ,
 		discount ,
