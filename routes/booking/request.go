@@ -298,10 +298,10 @@ func Booking(router *gin.Engine) {
 
 		//if membership discount not 0 (membership id 7)
 		//=============================================================
-		if membership_data_result.Daily_discount != 0 {
+		if membership_data_result.Daily_discount != 7 {
 
-			discount = total * int(membership_data_result.Daily_discount/100)
-
+			temp := float64(total) * membership_data_result.Daily_discount
+			discount = int(temp)
 		}
 
 		//checking booktypeID [HARDCODE]
