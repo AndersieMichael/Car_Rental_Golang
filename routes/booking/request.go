@@ -862,14 +862,60 @@ func Booking(router *gin.Engine) {
 			body2.Booking_ID = book_id
 			body2.Incentive = incentive
 
-			// ADD INCENTIVE DATA
-			//=============================================================
-			err := inc.UpdateIncentivebyBOOK(db, book_id, body2)
+			incentive_get_id_result, err := inc.GetIncentiveByBOOKID(db, book_id)
+			if err != nil && err != sql.ErrNoRows {
+				data := Response{
+					Message:       "Failed",
+					Error_Key:     "error_internal_server",
+					Error_Message: "error in GetIncentiveByBOOKID function",
+				}
+				webhook.PostToWebHook(c.Request.Method, c.Request.Host+c.Request.URL.Path, data.Error_Key, err.Error(), "booking | request.go | get/id")
+				Err.HandleError(err)
+				c.JSON(200, data)
+				return //END
+			}
+
+			// check if Incentive not exist
+			if incentive_get_id_result.Driver_incentive_ID == 0 {
+
+				// ADD INCENTIVE DATA
+				//=============================================================
+				_, err := inc.AddIncentive(db, body2)
+				if err != nil {
+					data := Response{
+						Message:       "Failed",
+						Error_Key:     "error_internal_server",
+						Error_Message: "error in AddIncentive function",
+					}
+					webhook.PostToWebHook(c.Request.Method, c.Request.Host+c.Request.URL.Path, data.Error_Key, err.Error(), "booking | request.go | add")
+					Err.HandleError(err)
+					c.JSON(200, data)
+					return //END
+				}
+			}else{
+				
+				// UPDATE INCENTIVE DATA
+				//=============================================================
+				err = inc.UpdateIncentivebyBOOK(db, book_id, body2)
+				if err != nil {
+					data := Response{
+						Message:       "Failed",
+						Error_Key:     "error_internal_server",
+						Error_Message: "error in UpdateIncentivebyBOOK function",
+					}
+					webhook.PostToWebHook(c.Request.Method, c.Request.Host+c.Request.URL.Path, data.Error_Key, err.Error(), "booking | request.go | update")
+					Err.HandleError(err)
+					c.JSON(200, data)
+					return //END
+				}
+			}
+		}else{
+			err := inc.DeleteIncentivebyBOOK(db,book_id)
 			if err != nil {
 				data := Response{
 					Message:       "Failed",
 					Error_Key:     "error_internal_server",
-					Error_Message: "error in UpdateIncentivebyBOOK function",
+					Error_Message: "error in DeleteIncentive function",
 				}
 				webhook.PostToWebHook(c.Request.Method, c.Request.Host+c.Request.URL.Path, data.Error_Key, err.Error(), "booking | request.go | update")
 				Err.HandleError(err)

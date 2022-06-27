@@ -252,7 +252,7 @@ func Incentive(router *gin.Engine) {
 			return //END
 		}
 
-		err = deleteIncentive(db, incentive_id)
+		err = DeleteIncentive(db, incentive_id)
 		if err != nil {
 			data := Response{
 				Message:       "Failed",

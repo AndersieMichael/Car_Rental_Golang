@@ -48,6 +48,27 @@ func getIncentiveByID(tx *sqlx.DB, id int) (GetIncentive, error) {
 	return data, err
 }
 
+//GET Incentive BY BOOK ID
+//=============================================================
+func GetIncentiveByBOOKID(tx *sqlx.DB, id int) (GetIncentive, error) {
+	var (
+		data GetIncentive
+	)
+
+	query := (`select di.driver_incentive_id ,b.driver_id , di.incentive  from driver_incentive di 
+	join booking b on b.booking_id = di.booking_id 
+	where di."booking_id" = $1`)
+
+	values := []interface{}{
+		id,
+	}
+	err := tx.QueryRowx(query, values...).StructScan(&data)
+	if err != nil {
+		return data, err
+	}
+	return data, err
+}
+
 //ADD Incentive
 //=============================================================
 func AddIncentive(tx *sqlx.DB, input IncentiveForm) (int, error) {
@@ -114,9 +135,27 @@ func UpdateIncentivebyBOOK(tx *sqlx.DB, id int, input IncentiveForm) error {
 
 //DELETE Incentive
 //=============================================================
-func deleteIncentive(tx *sqlx.DB, id int) error {
+func DeleteIncentive(tx *sqlx.DB, id int) error {
 	query := (`delete from "driver_incentive"
 	where "driver_incentive_id" =$1`)
+
+	values := []interface{}{
+		id,
+	}
+
+	_, err := tx.Exec(query, values...)
+	if err != nil {
+		return err
+	}
+
+	return err
+}
+
+//DELETE Incentive
+//=============================================================
+func DeleteIncentivebyBOOK(tx *sqlx.DB, id int) error {
+	query := (`delete from "driver_incentive"
+	where "booking_id" =$1`)
 
 	values := []interface{}{
 		id,
