@@ -29,12 +29,12 @@ func getIncentive(tx *sqlx.DB) ([]GetIncentive, error) {
 
 //GET Incentive BY ID
 //=============================================================
-func getIncentiveByID(tx *sqlx.DB, id int) (GetIncentive, error) {
+func getIncentiveByID(tx *sqlx.DB, id int) (GetIncentive2, error) {
 	var (
-		data GetIncentive
+		data GetIncentive2
 	)
 
-	query := (`select di.driver_incentive_id ,b.driver_id , di.incentive  from driver_incentive di 
+	query := (`select b.driver_id , di.incentive  from driver_incentive di 
 	join booking b on b.booking_id = di.booking_id 
 	where di."driver_id" = $1`)
 

@@ -14,6 +14,11 @@ type GetIncentive struct{
 	Incentive			int `json:"incentive" db:"incentive"`
 }
 
+type GetIncentive2 struct{
+	Driver_ID 			int `json:"driver_id" db:"driver_id"`
+	Incentive			int `json:"incentive" db:"incentive"`
+}
+
 type IncentiveForm struct{
 	Booking_ID 			int `json:"booking_id"`
 	Incentive			int `json:"incentive" binding:"required"`
