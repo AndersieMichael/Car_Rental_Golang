@@ -72,6 +72,43 @@ func getBookingByID(tx *sqlx.DB, id int) (GetBooking, error) {
 	return data, err
 }
 
+//GET BOOKING BY ID
+//=============================================================
+func getBookingByDriverID(tx *sqlx.DB, id int,start int64, end int64) (GetBooking, error) {
+	var (
+		data GetBooking
+	)
+
+	query := (`select booking_id,
+			customer_id,
+			cars_id,
+			extract(epoch from "start_time")::bigint as "start_time",
+			extract(epoch from "end_time")::bigint as "end_time",
+			total_cost,
+			finished,
+			discount,
+			booktype_id,
+			driver_id,
+			total_driver_cost 
+				from "booking" b
+	where b."driver_id" = $1 
+	and start_time between $2 and $3 
+	or end_time between $2 and $3 
+	or $2 between start_time and end_time 
+	or $3 between start_time and end_time`)
+
+	values := []interface{}{
+		id,
+		string(time.Unix(int64(start), 0).Format("2006-01-02")),
+		string(time.Unix(int64(end), 0).Format("2006-01-02")),
+	}
+	err := tx.QueryRowx(query, values...).StructScan(&data)
+	if err != nil {
+		return data, err
+	}
+	return data, err
+}
+
 //ADD BOOKING
 //=============================================================
 func addBooking(tx *sqlx.DB, input BookingForm) (int, error) {
@@ -178,6 +215,47 @@ func updateBooking(tx *sqlx.DB, id int, input BookingForm) error {
 		input.Booktype_ID,
 		input.Driver_ID,
 		input.Total_driver_cost,
+		id,
+	}
+
+	_, err := tx.Exec(query, values...)
+	if err != nil {
+		return err
+	}
+
+	return err
+}
+
+//UPDATE BOOKING
+//=============================================================
+func updateBookingV2(tx *sqlx.DB, id int, input BookingFormV2 , total_cost int,
+	discount int,
+	total_driver_cost int) error {
+		
+	query := (`update "booking"
+		set "customer_id" = $1,
+		"cars_id" = $2,         
+		"start_time"=$3,
+		"end_time" = $4,
+		"total_cost" = $5,         
+		"finished"=$6,
+		"discount"=$7,
+		"booktype_id" = $8,
+		"driver_id" = $9,         
+		"total_driver_cost"=$10
+		where booking_id=$11`)
+
+	values := []interface{}{
+		input.Customer_ID ,
+		input.Cars_ID ,
+		time.Unix(input.Start_time, 0).Format("2006-01-02"),
+		time.Unix(input.End_time, 0).Format("2006-01-02") ,
+		total_cost ,
+		input.Finished ,
+		discount ,
+		input.Booktype_ID ,
+		input.Driver_ID ,
+		total_driver_cost,
 		id,
 	}
 

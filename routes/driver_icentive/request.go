@@ -192,7 +192,7 @@ func Incentive(router *gin.Engine) {
 			return //END
 		}
 
-		err = updateIncentive(db, incentive_id, body)
+		err = UpdateIncentive(db, incentive_id, body)
 		if err != nil {
 			data := Response{
 				Message:       "Failed",

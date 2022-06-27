@@ -70,11 +70,33 @@ func AddIncentive(tx *sqlx.DB, input IncentiveForm) (int, error) {
 
 //UPDATE Incentive
 //=============================================================
-func updateIncentive(tx *sqlx.DB, id int, input IncentiveForm) error {
+func UpdateIncentive(tx *sqlx.DB, id int, input IncentiveForm) error {
 	query := (`update "driver_incentive"
 		set "booking_id" = $1,
 		"incentive" = $2
 		where driver_incentive_id=$3`)
+
+	values := []interface{}{
+		input.Booking_ID,
+		input.Incentive,
+		id,
+	}
+
+	_, err := tx.Exec(query, values...)
+	if err != nil {
+		return err
+	}
+
+	return err
+}
+
+//UPDATE Incentive
+//=============================================================
+func UpdateIncentivebyBOOK(tx *sqlx.DB, id int, input IncentiveForm) error {
+	query := (`update "driver_incentive"
+		set "booking_id" = $1,
+		"incentive" = $2
+		where booking_id=$3`)
 
 	values := []interface{}{
 		input.Booking_ID,
