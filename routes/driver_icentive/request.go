@@ -49,7 +49,6 @@ func Incentive(router *gin.Engine) {
 	// GET INCENTIVE BY ID
 	//=============================================================
 	route.GET("/get/:id", func(c *gin.Context) {
-		var temp incentiveTemplate
 		id := c.Param("id")
 		incentive_id, _ := strconv.Atoi(id)
 
@@ -58,12 +57,12 @@ func Incentive(router *gin.Engine) {
 		db := db.Connect()
 		defer db.Close()
 
-		incentive_get_id_result, err := getIncentiveByID(db, incentive_id)
+		incentive_get_id_result, err := getIncentivebyDriverID(db, incentive_id)
 		if err != nil && err != sql.ErrNoRows {
 			data := Response{
 				Message:       "Failed",
 				Error_Key:     "error_internal_server",
-				Error_Message: "error in getIncentiveByID function",
+				Error_Message: "error in getIncentivebyDriverID function",
 			}
 			webhook.PostToWebHook(c.Request.Method, c.Request.Host+c.Request.URL.Path, data.Error_Key, err.Error(), parent+" | request.go | get/id")
 			Err.HandleError(err)
@@ -72,7 +71,7 @@ func Incentive(router *gin.Engine) {
 		}
 
 		// check if Incentive not exist
-		if incentive_get_id_result.Driver_incentive_ID == 0 {
+		if incentive_get_id_result.Driver_ID == 0 {
 			data := Response{
 				Message:       "Failed",
 				Error_Key:     "error_id_not_found",
@@ -83,13 +82,12 @@ func Incentive(router *gin.Engine) {
 			c.JSON(200, data)
 			return //END
 		}
-		temp.Driver_ID = incentive_get_id_result.Driver_ID
-		temp.Incentive = incentive_get_id_result.Incentive
+
 		// ASSEMBLY RESPONSE
 		//=============================================================
 		data := Response{
 			Message: "Success",
-			Data:    temp,
+			Data:    incentive_get_id_result,
 		}
 
 		c.JSON(200, data)

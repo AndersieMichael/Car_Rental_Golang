@@ -4,13 +4,14 @@ import "github.com/jmoiron/sqlx"
 
 //GET Incentive
 //=============================================================
-func getIncentive(tx *sqlx.DB) ([]GetIncentive, error) {
+func getIncentive(tx *sqlx.DB) ([]incentiveTemplate, error) {
 	var (
-		data  GetIncentive
-		datas []GetIncentive
+		data  incentiveTemplate
+		datas []incentiveTemplate
 	)
-	query := (`select di.driver_incentive_id ,b.driver_id , di.incentive  from driver_incentive di 
-			join booking b on b.booking_id = di.booking_id `)
+	query := (`select b.driver_id , sum(incentive) as "incentive"  from driver_incentive di 
+			join booking b on b.booking_id = di.booking_id 
+			group by driver_id `)
 
 	rows, err := tx.Queryx(query)
 	if err != nil {
@@ -34,9 +35,31 @@ func getIncentiveByID(tx *sqlx.DB, id int) (GetIncentive, error) {
 		data GetIncentive
 	)
 
-	query := (`select di.driver_incentive_id ,b.driver_id , di.incentive  from driver_incentive di 
+	query := (`select di.driver_incentive_id ,b.driver_id ,sum(incentive) as "incentive"   from driver_incentive di 
 	join booking b on b.booking_id = di.booking_id 
-	where di."driver_id" = $1`)
+	where di."driver_incentive_id" = $1`)
+
+	values := []interface{}{
+		id,
+	}
+	err := tx.QueryRowx(query, values...).StructScan(&data)
+	if err != nil {
+		return data, err
+	}
+	return data, err
+}
+
+//GET Incentive BY ID
+//=============================================================
+func getIncentivebyDriverID(tx *sqlx.DB, id int) (incentiveTemplate, error) {
+	var (
+		data incentiveTemplate
+	)
+
+	query := (`select b.driver_id , sum(incentive) as "incentive"  from driver_incentive di 
+	join booking b on b.booking_id = di.booking_id 
+	where driver_id = $1
+	group by driver_id `)
 
 	values := []interface{}{
 		id,
