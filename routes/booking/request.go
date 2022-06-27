@@ -652,19 +652,6 @@ func Booking(router *gin.Engine) {
 			return //END
 		}
 
-		// if car stock is empty
-		if car_data_result.Stock == 0 {
-			data := Response{
-				Message:       "Failed",
-				Error_Key:     "error_stock_is_empty",
-				Error_Message: "error Car stock is empty",
-			}
-			webhook.PostToWebHook(c.Request.Method, c.Request.Host+c.Request.URL.Path, data.Error_Key, data.Error_Message, "booking | request.go | update")
-			Err.HandleError(err)
-			c.JSON(200, data)
-			return //END
-		}
-
 		//check if end time lower than start time
 		if body.End_time < body.Start_time {
 			data := Response{
@@ -835,7 +822,19 @@ func Booking(router *gin.Engine) {
 
 		//if car id defference
 		if *book_get_id_result.Cars_ID != *body.Cars_ID {
-			
+			// if car stock is empty
+			if car_data_result.Stock == 0 {
+				data := Response{
+					Message:       "Failed",
+					Error_Key:     "error_stock_is_empty",
+					Error_Message: "error Car stock is empty",
+				}
+				webhook.PostToWebHook(c.Request.Method, c.Request.Host+c.Request.URL.Path, data.Error_Key, data.Error_Message, "booking | request.go | update")
+				Err.HandleError(err)
+				c.JSON(200, data)
+				return //END
+			}
+
 			// UPDATE CAR STOCK
 			//=============================================================
 			stock := car_data_result.Stock - 1
