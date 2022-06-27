@@ -57,7 +57,7 @@ func Incentive(router *gin.Engine) {
 		db := db.Connect()
 		defer db.Close()
 
-		incentive_get_id_result, err := GetIncentiveByBOOKID(db, incentive_id)
+		incentive_get_id_result, err := getIncentiveByID(db, incentive_id)
 		if err != nil && err != sql.ErrNoRows {
 			data := Response{
 				Message:       "Failed",

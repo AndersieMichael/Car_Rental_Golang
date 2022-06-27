@@ -36,7 +36,7 @@ func getIncentiveByID(tx *sqlx.DB, id int) (GetIncentive, error) {
 
 	query := (`select di.driver_incentive_id ,b.driver_id , di.incentive  from driver_incentive di 
 	join booking b on b.booking_id = di.booking_id 
-	where di."driver_incentive_id" = $1`)
+	where di."driver_id" = $1`)
 
 	values := []interface{}{
 		id,
