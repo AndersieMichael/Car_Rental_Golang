@@ -90,12 +90,12 @@ func getBookingByDriverID(tx *sqlx.DB, id int,start int64, end int64) (GetBookin
 			booktype_id,
 			driver_id,
 			total_driver_cost 
-				from "booking" b
-	where b."driver_id" = $1 
-	and start_time between $2 and $3 
-	or end_time between $2 and $3 
-	or $2 between start_time and end_time 
-	or $3 between start_time and end_time`)
+			from "booking" b
+			where b."driver_id" = $1 
+			and (start_time between $2 and $3 
+			or end_time between $2 and $3 
+			or $2 between start_time and end_time 
+			or $3 between start_time and end_time)`)
 
 	values := []interface{}{
 		id,
@@ -231,7 +231,7 @@ func updateBooking(tx *sqlx.DB, id int, input BookingForm) error {
 func updateBookingV2(tx *sqlx.DB, id int, input BookingFormV2 , total_cost int,
 	discount int,
 	total_driver_cost int) error {
-		
+
 	query := (`update "booking"
 		set "customer_id" = $1,
 		"cars_id" = $2,         

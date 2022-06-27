@@ -12,6 +12,7 @@ import (
 	"golangSecond/utilities/webhook"
 	"math"
 	"strconv"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
@@ -677,6 +678,19 @@ func Booking(router *gin.Engine) {
 			return //END
 		}
 
+		//check if end time melewati now()
+		if body.End_time < time.Now().Unix() {
+			data := Response{
+				Message:       "Failed",
+				Error_Key:     "error_time_insert",
+				Error_Message: "end time cannot lower than now time",
+			}
+			webhook.PostToWebHook(c.Request.Method, c.Request.Host+c.Request.URL.Path, data.Error_Key, data.Error_Message, "booking | request.go | update")
+			Err.HandleError(err)
+			c.JSON(200, data)
+			return //END
+		}
+
 		//calculate days range
 		//=============================================================
 		rangeDate := body.End_time - body.Start_time
@@ -812,28 +826,32 @@ func Booking(router *gin.Engine) {
 			Err.HandleError(err)
 			c.JSON(200, data)
 			return //END
-		}else{
+		} else {
 			body.Driver_ID = nil
 		}
 
 		// EXECUTE ALL PROCES
 		//=============================================================
 
-		// UPDATE CAR STOCK
-		//=============================================================
-		stock := car_data_result.Stock - 1
+		//if car id defference
+		if *book_get_id_result.Cars_ID != *body.Cars_ID {
+			
+			// UPDATE CAR STOCK
+			//=============================================================
+			stock := car_data_result.Stock - 1
 
-		err = car.UpdateCarQuantity(db, *body.Cars_ID, stock)
-		if err != nil {
-			data := Response{
-				Message:       "Failed",
-				Error_Key:     "error_internal_server",
-				Error_Message: "error in UpdateCarQuantity function",
+			err = car.UpdateCarQuantity(db, *body.Cars_ID, stock)
+			if err != nil {
+				data := Response{
+					Message:       "Failed",
+					Error_Key:     "error_internal_server",
+					Error_Message: "error in UpdateCarQuantity function",
+				}
+				webhook.PostToWebHook(c.Request.Method, c.Request.Host+c.Request.URL.Path, data.Error_Key, err.Error(), "booking | request.go | update")
+				Err.HandleError(err)
+				c.JSON(200, data)
+				return //END
 			}
-			webhook.PostToWebHook(c.Request.Method, c.Request.Host+c.Request.URL.Path, data.Error_Key, err.Error(), "booking | request.go | update")
-			Err.HandleError(err)
-			c.JSON(200, data)
-			return //END
 		}
 
 		// ADD BOOKING DATA
@@ -892,8 +910,8 @@ func Booking(router *gin.Engine) {
 					c.JSON(200, data)
 					return //END
 				}
-			}else{
-				
+			} else {
+
 				// UPDATE INCENTIVE DATA
 				//=============================================================
 				err = inc.UpdateIncentivebyBOOK(db, book_id, body2)
@@ -909,8 +927,8 @@ func Booking(router *gin.Engine) {
 					return //END
 				}
 			}
-		}else{
-			err := inc.DeleteIncentivebyBOOK(db,book_id)
+		} else {
+			err := inc.DeleteIncentivebyBOOK(db, book_id)
 			if err != nil {
 				data := Response{
 					Message:       "Failed",
