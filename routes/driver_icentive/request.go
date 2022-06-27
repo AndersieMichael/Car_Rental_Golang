@@ -49,6 +49,7 @@ func Incentive(router *gin.Engine) {
 	// GET INCENTIVE BY ID
 	//=============================================================
 	route.GET("/get/:id", func(c *gin.Context) {
+		var temp incentiveTemplate
 		id := c.Param("id")
 		incentive_id, _ := strconv.Atoi(id)
 
@@ -82,12 +83,13 @@ func Incentive(router *gin.Engine) {
 			c.JSON(200, data)
 			return //END
 		}
-
+		temp.Driver_ID = incentive_get_id_result.Driver_ID
+		temp.Incentive = incentive_get_id_result.Incentive
 		// ASSEMBLY RESPONSE
 		//=============================================================
 		data := Response{
 			Message: "Success",
-			Data:    incentive_get_id_result,
+			Data:    temp,
 		}
 
 		c.JSON(200, data)
